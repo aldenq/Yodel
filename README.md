@@ -42,7 +42,7 @@ MESH NETWORKING:
     enable or disable mesh networking.
     True: mesh networking is enabled
     False: mesh networking is disabled
-  
+    mesh networking is disabled by default.
 
   
 GROUP MANAGMENT:
