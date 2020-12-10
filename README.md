@@ -89,10 +89,16 @@ raspberry pi mesh networking and rc control with wifi hardware
 
 ## Sender
 ``` python
-print(1)
+import yodel
+from time import sleep
 
+yodel.startRadio("wlx00c0caa5efb2") #initiate radio on interface wlx00c0caa5efb2 (the interface name will differ on your system)
 
+while True:
 
+    yodel.send("this is a message", name="listener",group="group_of_robots") #send data to robots named "listener" who are a member of group_of_robots
+    sleep(0.1) #sleep for .1 seconds(this is also just here as a convience)
+    
 ```
 
 
