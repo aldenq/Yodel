@@ -17,7 +17,7 @@ RADIO CONFIGURATION:
     using something in the 2.4ghz (channels 1-11) band will give best results.
     some leakage between channels will occur, in other words, if you are sending on channel 1  
     some of your messages can still be picked up by a robot listening on channel 2
-    
+    increasing the distrance between the channels will reduce this.
   yodel.setPower(int (dBm))
     
     set transmission power, using this may damage your wifi hardware. wifi interfaces usually sit somewhere between 2000dbm and 3000dbm. currently a limit of 3500 dBm is hardcoded to reduce odds of damaging hardware. this is hardcoded around line 70 in config.py. check local laws before adjusting your interfaces power.   
