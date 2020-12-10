@@ -1,11 +1,11 @@
 # Yodel
 raspberry pi mesh networking and rc control with wifi hardware
 
-#### Documentation:
+## Documentation:
 
 ### RADIO CONFIGURATION:
 
-  ## yodel.setInterface(str)
+  #### yodel.setInterface(str)
   
     set the interface that yodel should operate on, will auto configure that interface.
     interfaces need to support monitor mode and packet injection. 
