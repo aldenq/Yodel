@@ -88,12 +88,12 @@ raspberry pi mesh networking and rc control with wifi hardware
 # Example Code
 
 ## Sender
-'''python
+``` python
 print(1)
 
 
 
-'''
+```
 
 
 
