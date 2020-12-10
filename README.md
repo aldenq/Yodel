@@ -44,28 +44,18 @@ Mesh Networking:
     False: mesh networking is disabled
   
     
-  
+General:
+  yodel.setRepeats(int)
 
+    set retransmission count
 
+  yodel.setName(str)
 
+    set robot name used when receiving messages
 
+  yodel.getName()
 
-
-
-
-
-
-yodel.setRepeats(int)
-  
-  set retransmission count
-
-yodel.setName(str)
-
-  set robot name used when receiving messages
-
-yodel.getName()
-
-  returns the current name
+    returns the current name
   
 GROUP MANAGMENT:
 
