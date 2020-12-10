@@ -24,7 +24,7 @@ raspberry pi mesh networking and rc control with wifi hardware
     wifi interfaces usually sit somewhere between 2000dbm and 3000dbm.
     currently a limit of 3500 dBm is hardcoded to reduce odds of damaging hardware.
     this is hardcoded around line 70 in config.py.
-    ** check local laws before adjusting your interfaces power. **  
+    ##### check local laws before adjusting your interfaces power. 
 
 
 ### SENDING AND RECEIVING:
