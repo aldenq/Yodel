@@ -15,6 +15,8 @@ RADIO CONFIGURATION:
     set what radio channel is being used.
     https://en.wikipedia.org/wiki/List_of_WLAN_channels
     using something in the 2.4ghz (channels 1-11) band will give best results.
+    some leakage between channels will occur, in other words, if you are sending on channel 1  
+    some of your messages can still be picked up by a robot listening on channel 2
     
   yodel.setPower(int (dBm))
     
