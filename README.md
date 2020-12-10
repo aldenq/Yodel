@@ -102,7 +102,7 @@ while True:
 ```
 
 
-## receiver
+## Receiver
 ``` python
 
 
