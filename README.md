@@ -47,9 +47,9 @@ MESH NETWORKING:
   
 GROUP MANAGMENT:
 
-  yodel.addGroup()
+  yodel.addGroup(str)
 
-    Add robot to new group
+    Add robot to new group defined by str
 
   yodel.deleteGroup(str)
 
