@@ -20,14 +20,19 @@ RADIO CONFIGURATION:
     increasing the distrance between the channels will reduce this.
   yodel.setPower(int (dBm))
     
-    set transmission power, using this may damage your wifi hardware. wifi interfaces usually sit somewhere between 2000dbm and 3000dbm. currently a limit of 3500 dBm is hardcoded to reduce odds of damaging hardware. this is hardcoded around line 70 in config.py. check local laws before adjusting your interfaces power.   
+    set transmission power, using this may damage your wifi hardware.
+    wifi interfaces usually sit somewhere between 2000dbm and 3000dbm.
+    currently a limit of 3500 dBm is hardcoded to reduce odds of damaging hardware.
+    this is hardcoded around line 70 in config.py.
+    check local laws before adjusting your interfaces power.   
 
 
 SENDING AND RECEIVING:
 
   yodel.listen()
   
-    returns messages sent to your robot. actual receiving is being taken care of by another thread so yodel.listen is non blocking.
+    returns messages sent to your robot.
+    actual receiving is being taken care of by another thread so yodel.listen is non blocking.
 
   yodel.send(bytearray/int/string, name=str, group = str)
   
