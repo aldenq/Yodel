@@ -27,7 +27,7 @@ SENDING AND RECEIVING:
 
   yodel.listen()
   
-    returns for messages sent to your robot. actual receiving is being taken care of by another thread so yodel.listen is non blocking.
+    returns messages sent to your robot. actual receiving is being taken care of by another thread so yodel.listen is non blocking.
 
   yodel.send(bytearray/int/string, name=str, group = str)
   
