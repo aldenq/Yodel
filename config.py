@@ -12,9 +12,9 @@ def setRepeats(num):  # control amount of times a message is repeated during a s
     globaldat.totalsends = num
 
 
-def enableRelay():
+def enableRelay(state):
     #global relay
-    globaldat.relay = True
+    globaldat.relay = state
 
 
 def disableRelay():
@@ -23,7 +23,7 @@ def disableRelay():
 
 
 def initPolyNodelYodel():
-    enableRelay()
+    enableRelay(True)
 
 def setName(name):
     globaldat.robotName = name
