@@ -11,7 +11,7 @@ def typeManagment(data):
 
 
 
-
+"""
 def formPacket(tname, tgroup, data):
     identifier = "robot"
     tgroupB = bytearray(tgroup.encode(encoding='UTF-8', errors='strict'))
@@ -25,9 +25,9 @@ def formPacket(tname, tgroup, data):
     #buffer = 0
     namelen = len(tname)
     grouplen = len(tgroup)
-    senderlen = len(sender)
-    if namelen > 255 or grouplen > 255:
-        raise NameTooLong
+    #senderlen = len(sender)
+    #if namelen > 255 or grouplen > 255:
+    #    raise NameTooLong
     mid = random.randint(0, 4294967295)
     globaldat.lastMessages.append(mid)
     mid = mid.to_bytes(4, 'little')
@@ -45,3 +45,4 @@ def formPacket(tname, tgroup, data):
     output += dataB  # add data bytes, they go until the end of the frame so no length is needed
     #oframe = classes.frameStruct()
     return (output)
+"""

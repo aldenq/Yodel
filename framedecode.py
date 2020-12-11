@@ -1,5 +1,6 @@
 import globaldat
 import classes
+"""
 def processFrame(data):  #
     
     # print(lastMessages)
@@ -59,14 +60,14 @@ def processFrame(data):  #
         return (out)
     return(None)
     # print((namelen))
-
+"""
 def is_recipient(data):  #
     
     # print(lastMessages)
     
     frame = data[49:] #get data frame payload section
     pos = 0 #pos is used as a pointer to the current section of the header being decoded
-    ftype = frame[pos:pos+1]
+    #ftype = frame[pos:pos+1]
     
     pos += 1
     mID = frame[pos:pos + 4] #message id, the semi unique identifer to each message to avoid receiving them twice
@@ -82,7 +83,7 @@ def is_recipient(data):  #
             del globaldat.lastMessages[0]
 
        
-        out = classes.frameStruct(frame)
+        #out = classes.frameStruct(frame)
         pos += 4
         namelen = globaldat.getInt(frame[pos:pos + 1])
         pos += 1
