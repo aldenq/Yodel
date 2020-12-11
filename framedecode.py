@@ -61,11 +61,11 @@ def processFrame(data):  #
     return(None)
     # print((namelen))
 """
-def is_recipient(data):  #
+def is_recipient(data,rlen):  #
     
     # print(lastMessages)
     
-    frame = data[49:] #get data frame payload section
+    frame = data[rlen+26+5:] #get data frame payload section
     pos = 0 #pos is used as a pointer to the current section of the header being decoded
     #ftype = frame[pos:pos+1]
     

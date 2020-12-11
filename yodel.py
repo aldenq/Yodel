@@ -72,6 +72,8 @@ def sendData(packet, current_iface, repeats):
     seq = sn.to_bytes(4, 'little')
 
     header80211 = ftype + dur + dst + src + bssid + seq
+
+    #print(len(header80211))
     data = globaldat.radiotap + header80211 + b"\x72\x6f\x62\x6f\x74"+packet #attach radiotap headers, 80211 headers and yodel payload 
     #print(data,"radaa")
     for i in range(repeats):
@@ -100,18 +102,29 @@ def listenrecv():
         data = globaldat.s.recv(globaldat.ETH_FRAME_LEN)
     except:
         return (None)
-        
-    payload = data[44:]
+    radiolen = globaldat.getInt(data[2:3])
+    fcs = data[17]
+    if fcs == 2: #if fcs flag is set then remove the fcs which is the last 4 bytes
+        data = data[0:-4] 
+    #print(fcs)
+
+    
+    #print(radiolen,"rlen")
+
+    payload = data[radiolen+26:]
     
     pos = 0
+
+    
     starth = (payload[pos:pos + 5])
     starth2 = (payload[pos + 16:pos + 5 + 16])
-   
 
+    
     if starth2 == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are included on local frames
-        rdata = framedecode.is_recipient(data[16:])
+        #print("passed0")
+        rdata = framedecode.is_recipient(data[16:],0)
         #print(data,"payload")
-        #print(rdata)
+        
         if rdata:
             isr,dorelay = rdata
             #print(payload[21:],isr,dorelay,"data")
@@ -120,9 +133,12 @@ def listenrecv():
             if isr:
                 return(payload[21:])    
         
-    elif starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
-        rdata = framedecode.is_recipient(data)
-        #print(data,"payload")
+    if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
+        #print("passed1")
+        #print(payload,"payload")
+
+        rdata = framedecode.is_recipient(data,radiolen)
+        
         #print(rdata)
         if rdata:
             isr,dorelay = rdata

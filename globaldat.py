@@ -21,6 +21,7 @@ sendert = 0
 receivert = 0
 
 def getInt(bytea):
+    #print(bytea,"byteea")
     return (int.from_bytes(bytea, byteorder='little'))
 
 
