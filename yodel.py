@@ -9,15 +9,15 @@ from config import *
 from framegen import *
 from classes import *
 import framedecode
-import dynamicheaders
+from dynamicheaders import *
 import standardformats
 # iface="wlp3s0"
 # nmcli device set wlp3s0 managed no
 # sudo ip link set wlp3s0 down
 # sudo iwconfig wlp3s0 mode Monitor
 # sudo ip link set wlp3s0 up
-outgoing_data = dynamicheaders.section(standardformats.standard_header_format)
-incoming_data = dynamicheaders.section(standardformats.standard_header_format)
+outgoing_data = section(standardformats.standard_header_format)
+incoming_data = section(standardformats.standard_header_format)
 
 class frameRecv:
     def __init__(self, frame):
@@ -119,8 +119,8 @@ def listenrecv():
                 relayFrame(payload[21:]) #16+5
             if isr:
                 return(payload[21:])    
-        return(rdata)
-    if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
+        
+    elif starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
         rdata = framedecode.is_recipient(data)
         #print(data,"payload")
         #print(rdata)
@@ -131,7 +131,7 @@ def listenrecv():
                 relayFrame(payload[5:]) #16+5
             if isr:
                 return(payload[5:])    
-        return(rdata)
+        
     return(None)
 
 
@@ -141,6 +141,7 @@ incoming = LifoQueue(maxsize=64) #stores pending incoming messages, filled by th
 
 def send(payload, **kwargs):
     global outgoing,outgoing_data
+    
     name = kwargs.get("name", '')
     group = kwargs.get("group", '')
     mtype = kwargs.get("type", '')
@@ -160,6 +161,7 @@ def send(payload, **kwargs):
         outgoing_data.type = ""
     outgoing_data.Sname = globaldat.robotName
     outgoing_data.mid = random.randint(0,4294967296)
+    outgoing_data.payload = typeManagment(payload)
     fframe = bytes(outgoing_data) #get bytes
     #print(fframe)
     oframe = classes.frameStruct(fframe)
@@ -193,7 +195,7 @@ def listen():
     if not incoming.empty():    
         frame = incoming.get()
         data = frame.frame
-        data = dynamicheaders.decode(data,standardformats.standard_header_format) #this is bad/slow, fix later ###################################################################################################
+        data = decode(data,standardformats.standard_header_format) #this is bad/slow, fix later ###################################################################################################
         return(data)
     else:
         return(None)
