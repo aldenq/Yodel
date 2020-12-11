@@ -119,6 +119,6 @@ while True:
     sleep(0.1) #sleep for .1 seconds, this is just a convience
     data = yodel.listen() #listen for all data sent to robots named "listener" and/or who are a member of "group_of_robots"
     if data: 
-        print(data) #if data is found print it
+        print(data.payload) #if data is found print it
 
 
