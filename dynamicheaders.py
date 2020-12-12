@@ -1,20 +1,5 @@
 import globaldat,math
-class payload:
-     def __set__(self,data,a):
-         print(data,a,"aaa")
-         self.data=data
-     def __init__(self):
-         self.data = b""
-     def __repr__(self):
-        #out = ''
-        #print(self.data,"self.data")
-        
-        return(str(self.data)+"dbgdbg")
-     def __str__(self):
-        return(str(self.data)+"dbgdbg")
-        #out = ''
-        #print(self.data,"self.data")
-        
+
         
 class flags:  #class meant to be used in fields, is an array of bools, used to store flags about the packet
     # 
@@ -113,8 +98,7 @@ class section:
                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2 - 2*isstr)}{print_type}") #print rules for ints
             elif type(self.fields[i]) == flags:    
                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2 - 2*isstr)}{print_type}     {list(self.fields[i].lookup.keys())}") #print rules for flags
-            elif type(self.fields[i]) == payload:
-                print(f"{i}:{' '*space}\"{self.fields[i]}\"{' '*(space2 - 2*isstr)}{print_type}")
+           
         print(f"payload:{' '*space}{self.payload}" )
     def __bytes__(self):
         return(evalBytes(self.__dict__["fields"],self.__dict__["format"],self.__dict__["payload"]))
