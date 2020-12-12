@@ -14,7 +14,7 @@ raspberry pi mesh networking and rc control with wifi hardware
     
     set what radio channel is being used.
     https://en.wikipedia.org/wiki/List_of_WLAN_channels
-    using something in the 2.4ghz (channels 1-11) band will give best results.
+    using something in the 2.4ghz band (channels 1-11) will give best results.
     some leakage between channels will occur, in other words, if you are sending on channel 1  
     some of your messages can still be picked up by a robot listening on channel 2
     increasing the distrance between the channels will reduce this.
