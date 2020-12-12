@@ -2,10 +2,10 @@
 Yodel is a python library that uses WIFI hardware for remote control purposes. Because yodel does not rely on wifi hotspots it has a far greater range than simple wifi based remote control solutions at the cost of bandwidth. Yodel is it's own protocol that sits under 80211. Yodel was designed specifically with Raspberry PI robotics in mind however it should work with any linux computer with an appropriate wifi interface.
 
 # Setup and Config
-Yodel is not currently on Pypi so to use it you will have to download the code and place your projects in the same directory as the library source. next, you will need a system with a wifi interface on it that supports Monitor mode and packet injection, if your built in card does not support it look for a USB wifi dongle that supports monitor mode and packet injection. 
+Yodel is not currently on Pypi so to use it you will have to download the code and place your projects in the same directory as the library source. Next, you will need a system with a wifi interface on it that supports Monitor mode and packet injection, if your built in card does not support it look for a USB wifi dongle that supports monitor mode and packet injection. 
 I have had a lot of luck with:https://www.amazon.com/Wifi-Antenna-Raspberry-Pi-Instructions/dp/B00H95C0A2/ but many others that will work just fine also exist.
 when looking for a wifi dongle it only needs to support 2.4ghz, i would also recommend getting one with an external antenna to improve range. 
-once you have a supported wifi interface on your system you for the most part good to go, you probably want 2 computers with supported hardware as without this you will only be able to talk with yourself. 
+Once you have a supported wifi interface on your system you for the most part are good to go, you probably want 2 computers with supported hardware as without this you will only be able to talk with yourself. 
 you will need to get the interface id for the wifi interface you would like to use, this can be done with the "iw dev" command. 
 this will be needed in the "yodel.setInterface" function call in your code.
 
@@ -25,7 +25,7 @@ this will be needed in the "yodel.setInterface" function call in your code.
     using something in the 2.4ghz band (channels 1-11) will give best results.
     some leakage between channels will occur, in other words, if you are sending on channel 1  
     some of your messages can still be picked up by a robot listening on channel 2
-    increasing the distrance between the channels will reduce this.
+    increasing the distance between the channels will reduce this.
   #### yodel.setPower(int (dBm))
     
     set transmission power, using this may damage your wifi hardware.
@@ -60,7 +60,7 @@ this will be needed in the "yodel.setInterface" function call in your code.
     mesh networking is disabled by default.
 
   
-### GROUP MANAGMENT:
+### GROUP MANAGEMENT:
 
   #### yodel.addGroup(str)
 
@@ -105,7 +105,7 @@ yodel.startRadio("wlx00c0caa5efb2") #initiate radio on interface wlx00c0caa5efb2
 while True:
 
     yodel.send("this is a message", name="listener",group="group_of_robots") #send data to robots named "listener" who are a member of group_of_robots
-    sleep(0.1) #sleep for .1 seconds(this is also just here as a convience)
+    sleep(0.1) #sleep for .1 seconds(this is also just here as a convenience)
     
 ```
 
@@ -124,7 +124,7 @@ yodel.addGroup("group_of_robots")  #add robot to the group "group_of_robots"
 
 while True:
 
-    sleep(0.1) #sleep for .1 seconds, this is just a convience
+    sleep(0.1) #sleep for .1 seconds, this is just a convenience
     data = yodel.listen() #listen for all data sent to robots named "listener" and/or who are a member of "group_of_robots"
     if data: 
         print(data.payload) #if data is found print it
