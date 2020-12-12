@@ -1,7 +1,7 @@
 # Yodel
 Yodel is a python library that uses WIFI hardware for remote control purposes. Because yodel does not rely on wifi hotspots it has a far greater range than simple wifi based remote control solutions at the cost of bandwidth. Yodel is it's own protocol that sits under 80211. Yodel was designed specifically with Raspberry PI robotics in mind however it should work with any linux computer with an appropriate wifi interface.
 
-# Setup and Config
+## Setup and Config
 Yodel is not currently on Pypi so to use it you will have to download the code and place your projects in the same directory as the library source. Next, you will need a system with a wifi interface on it that supports Monitor mode and packet injection, if your built in card does not support it look for a USB wifi dongle that supports monitor mode and packet injection. 
 I have had a lot of luck with:https://www.amazon.com/Wifi-Antenna-Raspberry-Pi-Instructions/dp/B00H95C0A2/ but many others that will work just fine also exist.
 when looking for a wifi dongle it only needs to support 2.4ghz, i would also recommend getting one with an external antenna to improve range. 
