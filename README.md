@@ -1,5 +1,5 @@
 # Yodel
-raspberry pi mesh networking and rc control with wifi hardware
+raspberry pi mesh networking and remote control with wifi hardware.
 
 ## Documentation:
 
