@@ -4,13 +4,14 @@ import os
 import subprocess, random
 from queue import LifoQueue
 import threading
-import globaldat
-from config import *
-from framegen import *
-from classes import *
-import framedecode
-from dynamicheaders import *
-import standardformats
+import yodel.globaldat as globaldat
+from yodel.config import *
+from yodel.framegen import *
+from yodel.classes import *
+import yodel.framedecode as  framedecode
+from yodel.dynamicheaders import *
+import yodel.standardformats
+
 # iface="wlp3s0"
 # nmcli device set wlp3s0 managed no
 # sudo ip link set wlp3s0 down
@@ -152,7 +153,7 @@ def listenrecv():
 
 
 outgoing = LifoQueue(maxsize=64) #stores pending outgoing messages, will be emptied by threaded sender
-incoming = LifoQueue(maxsize=64) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
+incoming = LifoQueue(maxsize=16) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
 
 
 def send(payload, **kwargs):

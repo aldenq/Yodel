@@ -2,7 +2,7 @@ import os
 import socket
 import subprocess
 import threading
-import globaldat
+import yodel.globaldat as globaldat
 
 ####
 # settings managment

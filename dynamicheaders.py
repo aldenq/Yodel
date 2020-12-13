@@ -1,4 +1,5 @@
-import globaldat,math
+import yodel.globaldat as globaldat
+import math
 
         
 class flags:  #class meant to be used in fields, is an array of bools, used to store flags about the packet
