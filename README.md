@@ -3,7 +3,10 @@ Yodel is a python library that uses WIFI hardware for remote control purposes. B
 
 ## Setup and Config
 yodel is available through pip, use:
+
 pip3 install yodelnet
+
+
 Next, you will need a system with a wifi interface on it that supports Monitor mode and packet injection, if your built in card does not support it look for a USB wifi dongle that supports monitor mode and packet injection. 
 I have had a lot of luck with:https://www.amazon.com/Wifi-Antenna-Raspberry-Pi-Instructions/dp/B00H95C0A2/ but many others that will work just fine also exist.
 when looking for a wifi dongle it only needs to support 2.4ghz, i would also recommend getting one with an external antenna to improve range. 
