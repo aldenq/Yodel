@@ -102,7 +102,7 @@ this will be needed in the "yodel.setInterface" function call in your code.
 
 ## Sender
 ``` python
-import yodel.yodel as yodel
+import yodel
 from time import sleep
 
 yodel.startRadio("wlx00c0caa5efb2") #initiate radio on interface wlx00c0caa5efb2 (the interface name will differ on your system)
@@ -119,7 +119,7 @@ while True:
 ``` python
 
 
-import yodel.yodel as yodel
+import yodel
 from time import sleep
 
 yodel.startRadio("wlx00c0caa5efb2") #initiate radio on interface wlx00c0caa5efb2 (the interface name will differ on your system)
