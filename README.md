@@ -15,7 +15,7 @@ you will need to get the interface id for the wifi interface you would like to u
 this will be needed in the "yodel.startRadio" function call in your code.
 ## Misc info:
   programs using yodel need to be ran as root. 
-
+  the internal WIFI antenna inside raspberry pi's are not combatible without a chunk of work. I would reccomend buying a cheap USB Dongle such as the one above.
 
 ## Documentation:
 
