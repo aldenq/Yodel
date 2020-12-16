@@ -4,7 +4,7 @@ Yodel is a python library that uses WIFI hardware for remote control purposes. B
 ## Setup and Config
 yodel is available through pip, use:
 
-pip3 install yodelnet
+sudo pip3 install yodelnet
 
 
 Next, you will need a system with a wifi interface on it that supports Monitor mode and packet injection, if your built in card does not support it look for a USB wifi dongle that supports monitor mode and packet injection. 
