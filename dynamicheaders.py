@@ -46,7 +46,7 @@ class flags:  #class meant to be used in fields, is an array of bools, used to s
         out = ''
         #print(self.data,"self.data")
         for i in range(8):
-            val = str(self.data[i])
+            val = str(int(self.data[i]))
             out += val
         return(out)
     
@@ -75,6 +75,7 @@ class section:
         type_lookup = {
 "<class 'int'>":"Int",
 "<class '__main__.flags'>":"Flags",
+"<class 'yodel.dynamicheaders.flags'>":"Flags",
 "<class '__main__.payloads'>":"Payloads",
 "<class 'bytes'>":"bytes",
 "<class 'str'>":"String"}
