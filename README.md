@@ -12,7 +12,7 @@ I have had a lot of luck with:https://www.amazon.com/Wifi-Antenna-Raspberry-Pi-I
 when looking for a wifi dongle it only needs to support 2.4ghz, i would also recommend getting one with an external antenna to improve range. 
 Once you have a supported wifi interface on your system you for the most part are good to go, you probably want 2 computers with supported hardware as without this you will only be able to talk with yourself. 
 you will need to get the interface id for the wifi interface you would like to use, this can be done with the "iw dev" command. 
-this will be needed in the "yodel.setInterface" function call in your code.
+this will be needed in the "yodel.startRadio" function call in your code.
 
 ## Documentation:
 
