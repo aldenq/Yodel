@@ -13,6 +13,9 @@ when looking for a wifi dongle it only needs to support 2.4ghz, i would also rec
 Once you have a supported wifi interface on your system you for the most part are good to go, you probably want 2 computers with supported hardware as without this you will only be able to talk with yourself. 
 you will need to get the interface id for the wifi interface you would like to use, this can be done with the "iw dev" command. 
 this will be needed in the "yodel.startRadio" function call in your code.
+## Misc info:
+  programs using yodel need to be ran as root. 
+
 
 ## Documentation:
 
