@@ -73,21 +73,27 @@ class section:
     def print(self): #fancy print 
         
         type_lookup = {
-"<class 'int'>":"Int",
-"<class '__main__.flags'>":"Flags",
-"<class 'yodel.dynamicheaders.flags'>":"Flags",
-"<class '__main__.payloads'>":"Payloads",
-"<class 'bytes'>":"bytes",
-"<class 'str'>":"String"}
-        
+        bytearray:"bytearray",
+        int:"Int",
+        flags:"Flags",
+        bytes:"bytes",
+        str:"String"
+        }
+                
         for i in list(self.fields.keys()):
             name_len = len(str(i))
             space = 20
 
             dat_len = len(str(self.fields[i]))
             space2 = 20
-            isstr = type(self.fields[i]) == str
-            print_type = type_lookup[str(type(self.fields[i]))]
+            objt  = self.__dict__["format"].fields_dict[i].type
+            #print(objt)
+            
+
+           
+
+
+            print_type = type_lookup[objt]
             if dat_len < space2:
                 space2 = space2-dat_len
             if name_len < space:
@@ -95,11 +101,11 @@ class section:
                 
             
             if type(self.fields[i]) == str:    
-                print(f"{i}:{' '*space}\"{self.fields[i]}\"{' '*(space2 - 2*isstr)}{print_type}") #print rules for strings
+                print(f"{i}:{' '*space}\"{self.fields[i]}\"{' '*(space2 - 2)}{print_type}") #print rules for strings
             elif type(self.fields[i]) == int:    
-                print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2 - 2*isstr)}{print_type}") #print rules for ints
+                print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}") #print rules for ints
             elif type(self.fields[i]) == flags:    
-                print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2 - 2*isstr)}{print_type}     {list(self.fields[i].lookup.keys())}") #print rules for flags
+                print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}     {list(self.fields[i].lookup.keys())}") #print rules for flags
            
         print(f"payload:{' '*space}{self.payload}" )
     def __bytes__(self):
@@ -154,7 +160,9 @@ class section:
 
 class field:  #used to create new fields, a field being a section of memory meant to hold one value
     def __init__(self,Name,Type,*args):
-        if Type==int or Type == str:
+        #print(Name,Type)
+        if Type==int or Type == str or Type == bytearray:
+            #print(Name,Type,"2")
             #min/max: when type is an integer min refers to the smallest possible integer and max refers to the largest
             #when type is a string or byte array than min refers to the shortest possible str and max refers to the longest possible
             if len(args) == 2:
@@ -244,11 +252,11 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
         field_data = field_dict[i]
         format_field = format.fields_dict[i]  #take the field from the format
         field_type = format_field.type #get the expected data type of the field
-        
+        #print(field_type)
         #fmax = format_field.max 
         fmin = format_field.min #min length(when refering to bytearray or string)/ value(when refering to an int)
         flen = format_field.len #length in bytes of field
-            
+        
         if field_type == type(field_data): #check if the expected data type matches the actual type
             
             if field_type == int:
@@ -280,8 +288,8 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
 
             
             pass
-        else:
-            print("bad",field_data,field_type,i)
+        #else:
+            #print("bad",field_data,field_type,i)
     out += payload        
     return(out)
 
