@@ -28,7 +28,7 @@ this will be needed in the "yodel.startRadio" function call in your code.
     set the interface that yodel should operate on, will auto configure that interface.
     interfaces need to support monitor mode and packet injection. 
     (a list of valid interfaces can be found by using the "iw dev" command)
-  #### yodel.setChannel(int):
+  #### yodel.setChannel(int)
     
     set what radio channel is being used.
     https://en.wikipedia.org/wiki/List_of_WLAN_channels
