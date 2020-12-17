@@ -103,6 +103,37 @@ this will be needed in the "yodel.startRadio" function call in your code.
   #### yodel.getName()
 
     returns the current name
+### DATA MANAGMENT:
+  yodel.send() only takes in bytearrays, strings and integers. This is great for most simple uses but to send more complicated data sets say one int followed by 3 strings you would need to create your own encoding and decoding scheme. yodel has a built in encoding and decoding scheme. three main structures exist and a couple functions exist to faciliate this. 
+
+first, some example code to ground this:
+
+``` python
+lighting_header = [
+    
+    yodel.field("lights",yodel.flags,["red","green","yellow"])
+    
+]
+lighting_format = yodel.format(lighting_header)
+
+
+lighting_data = yodel.section(lighting_format)
+
+
+lighting_data.lights["red"] = True
+```
+
+####yodel.field
+
+####yodel.format
+
+####yodel.section
+
+
+
+
+
+
 
 # Example Code
 
