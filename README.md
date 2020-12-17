@@ -17,7 +17,7 @@ this will be needed in the "yodel.startRadio" function call in your code.
   programs using yodel need to be ran as root. 
   
   the internal WIFI antenna inside raspberry pi's are not combatible without a chunk of work, it appears to be a driver issue, if you want to look into 
-  getting Yodel working on the internal WIFI interface google "patching raspberry pi wifi drivers for monitor mode and packet injection". I would reccomend just buying a cheap USB Dongle such as the one above.
+  getting Yodel working on the internal WIFI interface google "patching raspberry pi wifi drivers for monitor mode and packet injection"(ping me if you get this working). I would reccomend just buying a cheap USB Dongle such as the one above.
 
 ## Documentation:
 
