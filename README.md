@@ -19,6 +19,7 @@ this will be needed in the "yodel.startRadio" function call in your code.
   the internal WIFI antenna inside raspberry pi's are not combatible without a chunk of work, it appears to be a driver issue, if you want to look into 
   getting Yodel working on the internal WIFI interface google "patching raspberry pi wifi drivers for monitor mode and packet injection"(ping me if you get this working). I would reccomend just buying a cheap USB Dongle such as the one above.
 
+ if you are having any problems related to unreliable or no data coming through check the channels on both devices
 ## Documentation:
 
 ### RADIO CONFIGURATION:
@@ -111,7 +112,7 @@ import yodel
 from time import sleep
 
 yodel.startRadio("wlx00c0caa5efb2") #initiate radio on interface wlx00c0caa5efb2 (the interface name will differ on your system)
-
+yodel.setChannel(5)
 while True:
 
     yodel.send("this is a message", name="listener",group="group_of_robots") #send data to robots named "listener" who are a member of group_of_robots
@@ -130,7 +131,7 @@ from time import sleep
 yodel.startRadio("wlx00c0caa5efb2") #initiate radio on interface wlx00c0caa5efb2 (the interface name will differ on your system)
 yodel.setName("listener")  #set the robot's name to listener
 yodel.addGroup("group_of_robots")  #add robot to the group "group_of_robots"
-
+yodel.setChannel(5)
 
 while True:
 
