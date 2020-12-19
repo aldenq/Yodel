@@ -1,7 +1,7 @@
 import subprocess, random , os , time, socket
 import threading
 from queue import LifoQueue
-
+import multiprocessing as mp
 import time
 
 import yodel.globaldat as globaldat
@@ -19,6 +19,12 @@ import yodel.standardformats as standardformats
 outgoing_data = section(standardformats.standard_header_format)
 incoming_data = section(standardformats.standard_header_format)
 
+
+#outgoing = LifoQueue(maxsize=64) #stores pending outgoing messages, will be emptied by threaded sender
+if __name__ == "yodel.yodel":
+    outgoing = mp.Queue()
+    #incoming = LifoQueue(maxsize=16) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
+    incoming = mp.Queue()
 class frameRecv:
     def __init__(self, frame):
         self.frame = frame
@@ -44,12 +50,18 @@ class frameRecv:
 # print(payload,group,name)
 
 def setupThreads():
-    global sendert,receivert
-    sendert = threading.Thread(target=sender, args=(),daemon=True)
-    receivert = threading.Thread(target=receiver, args=(), daemon=True)
-    receivert.start()
-    sendert.start()
-    #print("test")
+    
+    global sendert,receivert,outgoing,incoming
+    if __name__ == "yodel.yodel":
+        #sendert = threading.Thread(target=sender, args=(),daemon=True)
+        sendert = mp.Process(target=sender, args=(outgoing,))
+        sendert.daemon = True
+
+        receivert = mp.Process(target=receiver, args=(incoming,))
+        receivert.daemon = True
+        receivert.start()
+        sendert.start()
+        #print("test")
 
 def startRadio(interf): #all functions needed to initiate radios 
     
@@ -76,6 +88,7 @@ def sendData(packet, current_iface, repeats):
     #print(len(header80211))
     data = globaldat.radiotap + header80211 + b"\x72\x6f\x62\x6f\x74"+packet #attach radiotap headers, 80211 headers and yodel payload 
     #print(data,"radaa")
+    
     for i in range(repeats):
         # print(data)
         # print(len(data))
@@ -151,8 +164,6 @@ def listenrecv():
     return(None)
 
 
-outgoing = LifoQueue(maxsize=64) #stores pending outgoing messages, will be emptied by threaded sender
-incoming = LifoQueue(maxsize=16) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
 
 
 def send(payload, **kwargs):
@@ -178,27 +189,29 @@ def send(payload, **kwargs):
     outgoing_data.Sname = globaldat.robotName
     outgoing_data.mid = random.randint(0,4294967296)
     outgoing_data.payload = typeManagment(payload)
+
     fframe = bytes(outgoing_data) #get bytes
     #print(fframe)
     oframe = frameStruct(fframe)
     oframe.repeats=globaldat.totalsends
+    #print(__name__ == )
     outgoing.put(oframe)
     # sendData(fframe,iface,totalsends)
 
 
-def sender():
+def sender(outgoing):
     #print("s")
-    global outgoing
+    #global outgoing
 
     while True:
 
-        if not outgoing.empty():
+        
 
-            frame = outgoing.get()
+        frame = outgoing.get()
 
-            reps = frame.repeats
-            dat = frame.bytes
-            sendData(dat, globaldat.iface, reps)
+        reps = frame.repeats
+        dat = frame.bytes
+        sendData(dat, globaldat.iface, reps)
             # print(frame)
 
 
@@ -208,19 +221,19 @@ def sender():
 
 def listen():
     global incoming
-    if not incoming.empty():    
-        frame = incoming.get()
+    try: 
+        frame = incoming.get(False)
         data = frame.frame
         data = decode(data,standardformats.standard_header_format) #this is bad/slow, fix later ###################################################################################################
         return(data)
-    else:
+    except:
         return(None)
 
-def receiver():
-    global incoming
+def receiver(incoming):
+    #global incoming
     globaldat.s.settimeout(.01)
     while True:
-        time.sleep(globaldat.delay)
+        
         dat = listenrecv()
         if dat != None:
             formatted = frameRecv(dat)
