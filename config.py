@@ -94,7 +94,7 @@ def enableMonitor(interf):  # auto configure monitor mode on interface
     os.system(f"sudo rfkill unblock wifi; sudo rfkill unblock all")
     os.system(f"nmcli device set {interf} managed no")
     os.system(f"sudo ip link set {interf} down")
-    os.system(f"sudo iwconfig {interf} mode Monitor")
+    os.system(f"sudo iwconfig {interf} mode Monitor")   
     os.system(f"sudo ip link set {interf} up")
 
 

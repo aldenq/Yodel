@@ -1,16 +1,15 @@
-import socket
-import time
-import os
-import subprocess, random
-from queue import LifoQueue
+import subprocess, random , os , time, socket
 import threading
+from queue import LifoQueue
+
+import time
+
 import yodel.globaldat as globaldat
 from yodel.config import *
-from yodel.framegen import *
 from yodel.classes import *
 import yodel.framedecode as  framedecode
 from yodel.dynamicheaders import *
-import yodel.standardformats
+import yodel.standardformats as standardformats
 
 # iface="wlp3s0"
 # nmcli device set wlp3s0 managed no
@@ -118,21 +117,21 @@ def listenrecv():
 
     
     starth = (payload[pos:pos + 5])
-    starth2 = (payload[pos + 16:pos + 5 + 16])
+    #starth2 = (payload[pos + 16:pos + 5 + 16])
 
     
-    if starth2 == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are included on local frames
+    #if starth2 == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are included on local frames
         #print("passed0")
-        rdata = framedecode.is_recipient(data[16:],0)
+    #    rdata = framedecode.is_recipient(data[16:],0)
         #print(data,"payload")
         
-        if rdata:
-            isr,dorelay = rdata
+    #    if rdata:
+    #        isr,dorelay = rdata
             #print(payload[21:],isr,dorelay,"data")
-            if dorelay:
-                relayFrame(payload[21:]) #16+5
-            if isr:
-                return(payload[21:])    
+    #        if dorelay:
+    #            relayFrame(payload[21:]) #16+5
+    #        if isr:
+    #            return(payload[21:])    
         
     if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
         #print("passed1")
@@ -181,7 +180,7 @@ def send(payload, **kwargs):
     outgoing_data.payload = typeManagment(payload)
     fframe = bytes(outgoing_data) #get bytes
     #print(fframe)
-    oframe = classes.frameStruct(fframe)
+    oframe = frameStruct(fframe)
     oframe.repeats=globaldat.totalsends
     outgoing.put(oframe)
     # sendData(fframe,iface,totalsends)
@@ -219,8 +218,9 @@ def listen():
 
 def receiver():
     global incoming
-
+    globaldat.s.settimeout(.01)
     while True:
+        time.sleep(globaldat.delay)
         dat = listenrecv()
         if dat != None:
             formatted = frameRecv(dat)

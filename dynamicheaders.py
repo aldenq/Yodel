@@ -1,6 +1,12 @@
 import yodel.globaldat as globaldat
 import math
-
+import copy
+def typeManagment(data):
+    dtype = type(data)
+    if dtype == str:
+        return(bytearray(data.encode(encoding='UTF-8', errors='strict')))
+    elif dtype == bytes:
+        return(data) 
         
 class flags:  #class meant to be used in fields, is an array of bools, used to store flags about the packet
     # 
@@ -13,16 +19,17 @@ class flags:  #class meant to be used in fields, is an array of bools, used to s
             self.data[key] = int(value)
 
 
-    def __init__(self,lookup):
-        self.data = [0,0,0,0,0,0,0,0]
-        self.lookup = {}
+    def __init__(self,lookup_table): 
         
-        if lookup:
+        self.data = [0,0,0,0,0,0,0,0]
+        self.lookup = {} #lookup table, maps names provided by the field onto indexes in data
+        self.a = 2
+        if lookup_table: #check if lookup table is provided
             #print(lookup)
-            for i in range(len(lookup)):
-                key = lookup[i]
-                if key != None:
-                    self.lookup[key] = i
+            for i in range(len(lookup_table)): #index lookup table, check to see if a name has been provided, if so create an entry in lookup dict with the key as the name and the value as the index 
+                key = lookup_table[i]
+                if key != None: #checks to see if the name provided for a given matrix is None, this is so that ["a",None,"b"] will only set a key for index 0 and 2
+                    self.lookup[key] = i #create dict entry with key being a name provided and the value being the index being mapped to
                     
 
 
@@ -50,16 +57,33 @@ class flags:  #class meant to be used in fields, is an array of bools, used to s
             out += val
         return(out)
     
-class format:
+class format:  #takes in a list of fields and turns them into a format
     supported_types = [int,str,bytearray,flags]
+
+
+    def gen_data(self):
+        self.output = {}
+        for i in list(self.fields_dict.keys()):
+            #print(self.__dict__.keys())
+            if self.fields_dict[i].type==flags: #some fields are using classes instead of data types, these need to be hard coded
+                lookup  = self.fields_dict[i].lookup
+                self.output[i] = flags(lookup)
+            
+            #elif format.fields_dict[i].type==payload:
+                #self.__dict__["fields"][i] = payload()
+            else:
+                self.output[i] = 0
+    
     def __init__(self, fields):
-        self.fields_dict = {}
-        self.fields = fields
+        self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
+        self.fields = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
+        self.output = {}
         for i in range(len(fields)):
             fname = fields[i].name
             if fname in self.fields_dict:
                 print("warn: header name repeat.")
             self.fields_dict[fname] = fields[i]
+        self.gen_data()
         #print(self.fields_dict)
 
 
@@ -73,7 +97,7 @@ class section:
     def print(self): #fancy print 
         
         type_lookup = {
-        bytearray:"bytearray",
+        bytearray:"Bytearray",
         int:"Int",
         flags:"Flags",
         bytes:"bytes",
@@ -86,27 +110,28 @@ class section:
 
             dat_len = len(str(self.fields[i]))
             space2 = 20
-            objt  = self.__dict__["format"].fields_dict[i].type
+            field_type  = self.__dict__["format"].fields_dict[i].type
             #print(objt)
             
 
            
 
 
-            print_type = type_lookup[objt]
+            print_type = type_lookup[field_type]
             if dat_len < space2:
                 space2 = space2-dat_len
             if name_len < space:
                 space = space - name_len
                 
             
-            if type(self.fields[i]) == str:    
+            if field_type == str:    
                 print(f"{i}:{' '*space}\"{self.fields[i]}\"{' '*(space2 - 2)}{print_type}") #print rules for strings
-            elif type(self.fields[i]) == int:    
+            elif field_type == int:    
                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}") #print rules for ints
-            elif type(self.fields[i]) == flags:    
+            elif field_type == flags:    
                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}     {list(self.fields[i].lookup.keys())}") #print rules for flags
-           
+            elif field_type == bytearray:
+                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}")
         print(f"payload:{' '*space}{self.payload}" )
     def __bytes__(self):
         return(evalBytes(self.__dict__["fields"],self.__dict__["format"],self.__dict__["payload"]))
@@ -137,9 +162,9 @@ class section:
 
     def __init__(self,format):
         self.__dict__["format"] = format
-        self.__dict__["fields"] = {}
+        self.__dict__["fields"] = copy.copy(format.output)
         self.__dict__["payload"]= b''
-        for i in list(format.fields_dict.keys()):
+        '''for i in list(format.fields_dict.keys()):
             #print(self.__dict__.keys())
             if format.fields_dict[i].type==flags: #some fields are using classes instead of data types, these need to be hard coded
                 lookup  = format.fields_dict[i].lookup
@@ -148,7 +173,7 @@ class section:
             #elif format.fields_dict[i].type==payload:
                 #self.__dict__["fields"][i] = payload()
             else:
-                self.__dict__["fields"][i] = 0
+                self.__dict__["fields"][i] = 0'''
 
 
 

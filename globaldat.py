@@ -6,7 +6,7 @@ lastMessages = []
 iface = ""  # interface name, set during runtime
 robotName = ""  # robot name, set by setName during runtime
 groups = [""]  # list of groups bot is a part of
-
+delay = 0
 ETH_P_ALL = 3
 ETH_FRAME_LEN = 1514  # Max. octets in frame sans FCS
 relay = False
@@ -27,3 +27,4 @@ def getInt(bytea):
 
 def bytesPrint(x):
     print(''.join(r'\x' + hex(letter)[2:] for letter in x))
+
