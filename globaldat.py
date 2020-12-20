@@ -19,7 +19,7 @@ s = False
 debug = True
 sendert = 0
 receivert = 0
-
+settings_entry = False
 def getInt(bytea):
     #print(bytea,"byteea")
     return (int.from_bytes(bytea, byteorder='little'))

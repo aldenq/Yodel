@@ -20,11 +20,35 @@ outgoing_data = section(standardformats.standard_header_format)
 incoming_data = section(standardformats.standard_header_format)
 
 
-#outgoing = LifoQueue(maxsize=64) #stores pending outgoing messages, will be emptied by threaded sender
 if __name__ == "yodel.yodel":
     outgoing = mp.Queue()
     #incoming = LifoQueue(maxsize=16) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
     incoming = mp.Queue()
+    globaldat.settings_entry, incoming_settings = mp.Pipe()
+
+
+def setting_update(setting,value):
+    
+    if setting == "name":
+        globaldat.robotName = value
+    elif setting == "add_group":
+        globaldat.groups.append(value)
+    elif setting == "del_group":
+        deleteGroup(value)
+    elif setting == "clr_group":
+        clearGroups()
+
+
+
+
+
+
+
+
+
+
+
+    
 class frameRecv:
     def __init__(self, frame):
         self.frame = frame
@@ -57,7 +81,7 @@ def setupThreads():
         sendert = mp.Process(target=sender, args=(outgoing,))
         sendert.daemon = True
 
-        receivert = mp.Process(target=receiver, args=(incoming,))
+        receivert = mp.Process(target=receiver, args=(incoming,incoming_settings,))
         receivert.daemon = True
         receivert.start()
         sendert.start()
@@ -120,7 +144,7 @@ def listenrecv():
     if fcs == 2: #if fcs flag is set then remove the fcs which is the last 4 bytes
         data = data[0:-4] 
     #print(fcs)
-
+   
     
     #print(radiolen,"rlen")
 
@@ -149,16 +173,18 @@ def listenrecv():
     if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
         #print("passed1")
         #print(payload,"payload")
-
+        
         rdata = framedecode.is_recipient(data,radiolen)
         
         #print(rdata)
         if rdata:
             isr,dorelay = rdata
             #print(payload[21:],isr,dorelay,"data")
+            #print(rdata)
             if dorelay:
                 relayFrame(payload[5:]) #16+5
             if isr:
+               
                 return(payload[5:])    
         
     return(None)
@@ -227,17 +253,23 @@ def listen():
         data = decode(data,standardformats.standard_header_format) #this is bad/slow, fix later ###################################################################################################
         return(data)
     except:
+        #print("nothing",__name__)
         return(None)
 
-def receiver(incoming):
+def receiver(incoming,incoming_settings):
     #global incoming
     globaldat.s.settimeout(.01)
     while True:
-        
+        if incoming_settings.poll(0):
+            settings = incoming_settings.recv()
+            setting_update(settings[0],settings[1])
+
+
         dat = listenrecv()
+        #print(dat)
         if dat != None:
             formatted = frameRecv(dat)
-
+            
             incoming.put(formatted)
 
             if incoming.full():

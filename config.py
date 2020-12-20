@@ -1,16 +1,17 @@
 import os
 import socket
 import subprocess
-import threading
-import yodel.globaldat as globaldat
 
+import yodel.globaldat as globaldat
+def send_to_receiver(data): #some settings changes require data to be sent to a thread this function takes care of that
+    globaldat.settings_entry.send(data)
 ####
 # settings managment
 ####
 def setRepeats(num):  # control amount of times a message is repeated during a send
     #global totalsends
     globaldat.totalsends = num
-
+    
 
 def enableRelay(state):
     #global relay
@@ -27,7 +28,7 @@ def initPolyNodelYodel():
 
 def setName(name):
     globaldat.robotName = name
-
+    send_to_receiver(["name",name])
 
 def getName():
     return (globaldat.robotName)
@@ -36,13 +37,14 @@ def getName():
 def addGroup(group):
     #global groups
     globaldat.groups.append(group)
-
+    send_to_receiver(["add_group",group])
 
 def deleteGroup(group):
     global groups
     if group in groups:
         loc = groups.index(group)
         del groups[loc]
+    send_to_receiver(["del_group",group])
 
 
 def getGroups():
@@ -52,6 +54,7 @@ def getGroups():
 def clearGroups():
     global groups
     groups = []
+    send_to_receiver(["clr_group",False])
 
 
 def setInterface(interf):

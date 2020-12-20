@@ -22,7 +22,7 @@ def is_recipient(data,rlen):  #
         if len(globaldat.lastMessages) > 64:
             del globaldat.lastMessages[0]
 
-       
+        
         #out = classes.frameStruct(frame)
         pos += 4
         namelen = globaldat.getInt(frame[pos:pos + 1])
@@ -41,6 +41,8 @@ def is_recipient(data,rlen):  #
         groupM = (group in globaldat.groups or gnamelen == 0)
         #if globaldat.relay == True and not (name == globaldat.robotName):
         #    relay = True
+
+        #print(name,group)
         relay = (globaldat.relay == True and not (name == globaldat.robotName))
             #relayFrame(frame)
         return(nameM and groupM,relay)
