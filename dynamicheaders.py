@@ -74,15 +74,19 @@ class format:  #takes in a list of fields and turns them into a format
             else:
                 self.output[i] = 0
     
-    def __init__(self, fields):
+    def __init__(self, fields,**kwargs):
+        self.mtype = kwargs.get("mtype", 0)
+        #print(self.mtype)
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
         self.fields = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
         self.output = {}
         for i in range(len(fields)):
             fname = fields[i].name
-            if fname in self.fields_dict:
-                print("warn: header name repeat.")
+            #if fname in self.fields_dict:
+                #print("warn: header name repeat.")
             self.fields_dict[fname] = fields[i]
+
+
         self.gen_data()
         #print(self.fields_dict)
 
@@ -110,6 +114,9 @@ class section:
 
             dat_len = len(str(self.fields[i]))
             space2 = 20
+            #print(dir(self.__dict__["format"].fields_dict[i]))
+            print(self.__dict__["format"].fields_dict[i].len)
+            print("a")
             field_type  = self.__dict__["format"].fields_dict[i].type
             #print(objt)
             
@@ -145,6 +152,7 @@ class section:
         
     
     def __getattr__(self, name):
+        #print(name,"name")
         if name != "payload":
             return(self.fields[name])
         else:
@@ -184,22 +192,34 @@ class section:
 
 
 class field:  #used to create new fields, a field being a section of memory meant to hold one value
-    def __init__(self,Name,Type,*args):
+    def __init__(self,Name,Type,*args,**kwargs):
         #print(Name,Type)
-        if Type==int or Type == str or Type == bytearray:
-            #print(Name,Type,"2")
-            #min/max: when type is an integer min refers to the smallest possible integer and max refers to the largest
-            #when type is a string or byte array than min refers to the shortest possible str and max refers to the longest possible
-            if len(args) == 2:
-                Min,Max = args
-            if len(args) == 1:
-                Max = args[0] #if only one number is given it is assumed to be the max length/ int size and the min is assumed to be zero
-                Min = 0
+        bytes_len = kwargs.get("bytes", False)
+        Min = kwargs.get("min", 0)
+        Max = kwargs.get("max", False)
+        #self.type = Type
 
-        
+        if Type == int:
+            #print("running",bytes_len)
+
             self.min = Min
             self.max = Max
-            self.len = math.ceil((Max-Min).bit_length()/8) #when type is an int len tells us the amount of bits needed to represent the possble options. when type is a str len tells us the amount of bits needed to store the length of the string
+            if bytes_len:
+                #print("bf")
+                self.len = bytes_len
+                print(self.len,"flen",bytes_len)
+                self.max = 2**(bytes_len*8)-1
+            else:
+                self.len = math.ceil((Max-Min).bit_length()/8) #when type is an int len tells us the amount of bits needed to represent the possble options. when type is a str len tells us the amount of bits needed to store the length of the string
+            #self.len  =4
+        elif Type == str or Type == bytearray:
+            if bytes_len:
+                Max = bytes_len
+            self.min = Min
+            self.max = Max
+            
+            self.len = math.ceil((Max-Min).bit_length()/8)
+           
         elif Type == flags:
                 self.min= 0
                 self.max = 0
@@ -208,8 +228,32 @@ class field:  #used to create new fields, a field being a section of memory mean
                     self.lookup = args[0]
                 else:
                     self.lookup = False
+        '''
+        if Type==int or Type == str or Type == bytearray:
+            #print(Name,Type,"2")
+            #min/max: when type is an integer min refers to the smallest possible integer and max refers to the largest
+            #when type is a string or byte array than min refers to the shortest possible str and max refers to the longest possible
+            
+
+
+
+            if blen != None:
+                Min = 0
+
+
+
+
+
+
+            if len(args) == 2:
+                Min,Max = args
+            if len(args) == 1:
+                Max = args[0] #if only one number is given it is assumed to be the max length/ int size and the min is assumed to be zero
+                Min = 0
+        '''
+        
+        
                 
-       
         self.name = Name #field name
         self.type = Type #field data type
         #self.len = math.ceil((Max-Min).bit_length()/8) #when type is an in len tells us the amount of bits needed to represent the possble options. when type is a str len tells us the amount of bits needed to store the length of the string
@@ -284,18 +328,22 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
         
         if field_type == type(field_data): #check if the expected data type matches the actual type
             
-            if field_type == int:
+            if field_type == int:   
                 #the amount of bytes for the int is included in the standard so it does not need to be added to the output
                 
                 field_data -= format_field.min
+                print(field_data,flen)
                 out += field_data.to_bytes(flen, 'little')
-               
+                print(field_data.to_bytes(flen, 'little'),"int dat")
             elif field_type == flags: #flags are always 1 byte
                 out += bytes(field_data)
                 
             elif field_type == str: 
                 field_len = len(field_data)
                 field_len -= fmin #minimum length is subtracted because the reciever will add the min back before reading the bytes
+
+
+                #print(flen,field_len,"string")
                 out += field_len.to_bytes(flen, 'little') #for string the length of the string first needs to be added as an int before the string data
                 out += bytearray(field_data.encode(encoding='UTF-8', errors='strict')) #strings are encoded as a utf-8 string
                 

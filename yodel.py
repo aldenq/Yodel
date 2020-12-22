@@ -16,6 +16,15 @@ import yodel.standardformats as standardformats
 # sudo ip link set wlp3s0 down
 # sudo iwconfig wlp3s0 mode Monitor
 # sudo ip link set wlp3s0 up
+
+    
+class frameRecv:
+    def __init__(self, frame):
+        self.frame = frame
+        self.time = time.time()
+
+
+
 outgoing_data = section(standardformats.standard_header_format)
 incoming_data = section(standardformats.standard_header_format)
 
@@ -48,11 +57,7 @@ def setting_update(setting,value):
 
 
 
-    
-class frameRecv:
-    def __init__(self, frame):
-        self.frame = frame
-        self.time = time.time()
+
 
 
 
@@ -194,12 +199,17 @@ def listenrecv():
 
 def send(payload, **kwargs):
     global outgoing,outgoing_data
-    
+    #print(type(payload))
     name = kwargs.get("name", '')
     group = kwargs.get("group", '')
     mtype = kwargs.get("type", '')
     #fframe = formPacket(name, group, payload)
     #fill in fields for outgoing_data structure
+
+    if type(payload) == section:
+        mtype = payload.format.mtype
+        payload= bytes(payload)
+        
     if name:
         outgoing_data.Rname = name
     else:
@@ -209,9 +219,9 @@ def send(payload, **kwargs):
     else:
         outgoing_data.Gname = ""
     if mtype:
-        outgoing_data.type = mtype
+        outgoing_data.mtype = mtype
     else:
-        outgoing_data.type = ""
+        outgoing_data.mtype = ""
     outgoing_data.Sname = globaldat.robotName
     outgoing_data.mid = random.randint(0,4294967296)
     outgoing_data.payload = typeManagment(payload)
@@ -221,6 +231,7 @@ def send(payload, **kwargs):
     oframe = frameStruct(fframe)
     oframe.repeats=globaldat.totalsends
     #print(__name__ == )
+    outgoing_data.print()
     outgoing.put(oframe)
     # sendData(fframe,iface,totalsends)
 
