@@ -1,3 +1,8 @@
+import time
+class frameRecv:
+    def __init__(self, frame):
+        self.frame = frame
+        self.time = time.time()
 
 
 class fmeta:

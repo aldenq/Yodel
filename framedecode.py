@@ -8,12 +8,12 @@ def is_recipient(data,rlen):  #
     frame = data[rlen+26+5:] #get data frame payload section
     pos = 0 #pos is used as a pointer to the current section of the header being decoded
     #ftype = frame[pos:pos+1]
-    print(frame)
-   
+    #print(frame)
+    #print("abc1234567821A1",__name__)
     mID = frame[pos:pos + 4] #message id, the semi unique identifer to each message to avoid receiving them twice
-    print(mID, "MID")
-    pos += 1
-    globaldat.bytesPrint(mID)
+    #print(__name__)
+    #pos += 1
+    #globaldat.bytesPrint(mID)
     if mID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
         return (False)
     if mID not in globaldat.lastMessages: #check if message has already been received
@@ -44,7 +44,7 @@ def is_recipient(data,rlen):  #
         #if globaldat.relay == True and not (name == globaldat.robotName):
         #    relay = True
 
-        #print(name,group)
+        
         relay = (globaldat.relay == True and not (name == globaldat.robotName))
             #relayFrame(frame)
         return(nameM and groupM,relay)

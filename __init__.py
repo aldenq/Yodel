@@ -1,1 +1,2 @@
-from yodel.yodel import *
+from yodel.yodelmain import *
+import yodel.framedecode as framedecode

@@ -207,7 +207,7 @@ class field:  #used to create new fields, a field being a section of memory mean
             if bytes_len:
                 #print("bf")
                 self.len = bytes_len
-                print(self.len,"flen",bytes_len)
+                #print(self.len,"flen",bytes_len)
                 self.max = 2**(bytes_len*8)-1
             else:
                 self.len = math.ceil((Max-Min).bit_length()/8) #when type is an int len tells us the amount of bits needed to represent the possble options. when type is a str len tells us the amount of bits needed to store the length of the string
@@ -332,9 +332,9 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
                 #the amount of bytes for the int is included in the standard so it does not need to be added to the output
                 
                 field_data -= format_field.min
-                print(field_data,flen)
+                #print(field_data,flen)
                 out += field_data.to_bytes(flen, 'little')
-                print(field_data.to_bytes(flen, 'little'),"int dat")
+                #print(field_data.to_bytes(flen, 'little'),"int dat")
             elif field_type == flags: #flags are always 1 byte
                 out += bytes(field_data)
                 
