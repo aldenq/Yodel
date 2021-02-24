@@ -11,13 +11,79 @@ from .classes import *
 import yodel.standardformats as standardformats
 from .dynamicheaders import *
 from yodel.config import *
-import yodel.framedecode as framedecode
+#import yodel.framedecode as framedecode
 
 
 import sys
 import multiprocessing as mp
 incoming = mp.Queue()
 globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
+
+
+
+
+
+
+
+
+def is_recipient(data,rlen):  #
+    
+    # print(lastMessages)
+    
+    frame = data[rlen+26+5:] #get data frame payload section
+    pos = 0 #pos is used as a pointer to the current section of the header being decoded
+    #ftype = frame[pos:pos+1]
+    #print(frame)
+    #print("abc1234567821A1",__name__)
+    mID = frame[pos:pos + 4] #message id, the semi unique identifer to each message to avoid receiving them twice
+    #print(__name__)
+    #pos += 1
+    #globaldat.bytesPrint(mID)
+    if mID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
+        return (False)
+    if mID not in globaldat.lastMessages: #check if message has already been received
+        
+        globaldat.lastMid = mID #set last mid to the current mid 
+        # print(mID)
+        globaldat.lastMessages.append(mID)
+        if len(globaldat.lastMessages) > 64:
+            del globaldat.lastMessages[0]
+
+        
+        #out = classes.frameStruct(frame)
+        pos += 4
+        namelen = globaldat.getInt(frame[pos:pos + 1])
+        pos += 1
+        
+        name = frame[pos:pos + namelen].decode("utf-8")
+        nameM = (name == globaldat.robotName or namelen == 0)
+
+        pos += namelen
+        gnamelen = globaldat.getInt(frame[pos:pos + 1])
+        pos += 1
+        group = frame[pos:pos + gnamelen].decode("utf-8")
+        pos += gnamelen
+
+        
+        groupM = (group in globaldat.groups or gnamelen == 0)
+        #if globaldat.relay == True and not (name == globaldat.robotName):
+        #    relay = True
+
+        
+        relay = (globaldat.relay == True and not (name == globaldat.robotName))
+            #relayFrame(frame)
+        return(nameM and groupM,relay)
+       
+    return (False)
+    # print((namelen))
+
+
+
+
+
+
+
+
 
 
 def setting_update(setting,value):
@@ -46,12 +112,12 @@ def relayFrame(frame):
 
 
 def listenrecv():
-    #print("a")
+   
     
     try:
         
         data = globaldat.s.recv(globaldat.ETH_FRAME_LEN)
-        #print(data)
+        
     except:
         return (None)
     
@@ -59,10 +125,7 @@ def listenrecv():
     fcs = data[17]
     if fcs == 2: #if fcs flag is set then remove the fcs which is the last 4 bytes
         data = data[0:-4] 
-    #print(fcs)
-   
-    
-    #print(radiolen,"rlen")
+
 
     payload = data[radiolen+26:]
     
@@ -70,33 +133,12 @@ def listenrecv():
 
     
     starth = (payload[pos:pos + 5])
-    #starth2 = (payload[pos + 16:pos + 5 + 16])
 
-    
-    #if starth2 == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are included on local frames
-        #print("passed0")
-    #    rdata = framedecode.is_recipient(data[16:],0)
-        #print(data,"payload")
-        
-    #    if rdata:
-    #        isr,dorelay = rdata
-            #print(payload[21:],isr,dorelay,"data")
-    #        if dorelay:
-    #            relayFrame(payload[21:]) #16+5
-    #        if isr:
-    #            return(payload[21:])    
-    #print("abcdef")        
     if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
-        #print("passed1")
-        #print(payload,"payload")
+        rdata = is_recipient(data,radiolen)
         
-        rdata = framedecode.is_recipient(data,radiolen)
-        
-        #print(rdata)
         if rdata:
             isr,dorelay = rdata
-            #print(payload[21:],isr,dorelay,"data")
-            #print(rdata)
             if dorelay:
                 relayFrame(payload[5:]) #16+5
             if isr:

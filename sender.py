@@ -119,7 +119,7 @@ def sender(outgoing,pipe): #thread that manages sending out data
     while True:
         #print("test1")
         if pipe.poll(0): #check for any new settings updates or other instructions from the main thread
-            print("data received")
+            #print("data received")
             settings = pipe.recv() #if there are any then receive them
             setting_update(settings[0],settings[1]) #use these as inputs to the settings update function
         
@@ -129,4 +129,4 @@ def sender(outgoing,pipe): #thread that manages sending out data
         reps = frame.repeats
         dat = frame.bytes
         sendData(dat, globaldat.iface, reps)
-        print(frame)
+        #print(frame)

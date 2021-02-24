@@ -34,7 +34,7 @@ def initPolyNodelYodel():
 def setName(name):
     globaldat.robotName = name
     send_to_receiver(["name",name])
-
+    send_to_sender(["name",name])
 def getName():
     return (globaldat.robotName)
 
@@ -43,14 +43,14 @@ def addGroup(group):
     #global groups
     globaldat.groups.append(group)
     send_to_receiver(["add_group",group])
-
+    send_to_sender(["add_group",group])
 def deleteGroup(group):
     global groups
     if group in groups:
         loc = groups.index(group)
         del groups[loc]
     send_to_receiver(["del_group",group])
-
+    send_to_sender(["del_group",group])
 
 def getGroups():
     return (groups)
@@ -60,7 +60,7 @@ def clearGroups():
     global groups
     groups = []
     send_to_receiver(["clr_group",False])
-
+    send_to_sender(["clr_group",False])
 
 def setInterface(interf):
     #global iface, s
