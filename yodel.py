@@ -1,7 +1,7 @@
 import subprocess, random , os , time, socket
 import threading
 from queue import LifoQueue
-
+import multiprocessing as mp
 import time
 
 import yodel.globaldat as globaldat
@@ -16,13 +16,48 @@ import yodel.standardformats as standardformats
 # sudo ip link set wlp3s0 down
 # sudo iwconfig wlp3s0 mode Monitor
 # sudo ip link set wlp3s0 up
-outgoing_data = section(standardformats.standard_header_format)
-incoming_data = section(standardformats.standard_header_format)
 
+    
 class frameRecv:
     def __init__(self, frame):
         self.frame = frame
         self.time = time.time()
+
+
+
+outgoing_data = section(standardformats.standard_header_format)
+incoming_data = section(standardformats.standard_header_format)
+
+
+if __name__ == "yodel.yodel":
+    outgoing = mp.Queue()
+    #incoming = LifoQueue(maxsize=16) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
+    incoming = mp.Queue()
+    globaldat.settings_entry, incoming_settings = mp.Pipe()
+
+
+def setting_update(setting,value):
+    
+    if setting == "name":
+        globaldat.robotName = value
+    elif setting == "add_group":
+        globaldat.groups.append(value)
+    elif setting == "del_group":
+        deleteGroup(value)
+    elif setting == "clr_group":
+        clearGroups()
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -44,12 +79,18 @@ class frameRecv:
 # print(payload,group,name)
 
 def setupThreads():
-    global sendert,receivert
-    sendert = threading.Thread(target=sender, args=(),daemon=True)
-    receivert = threading.Thread(target=receiver, args=(), daemon=True)
-    receivert.start()
-    sendert.start()
-    #print("test")
+    
+    global sendert,receivert,outgoing,incoming
+    if __name__ == "yodel.yodel":
+        #sendert = threading.Thread(target=sender, args=(),daemon=True)
+        sendert = mp.Process(target=sender, args=(outgoing,))
+        sendert.daemon = True
+
+        receivert = mp.Process(target=receiver, args=(incoming,incoming_settings,))
+        receivert.daemon = True
+        receivert.start()
+        sendert.start()
+        #print("test")
 
 def startRadio(interf): #all functions needed to initiate radios 
     
@@ -76,6 +117,7 @@ def sendData(packet, current_iface, repeats):
     #print(len(header80211))
     data = globaldat.radiotap + header80211 + b"\x72\x6f\x62\x6f\x74"+packet #attach radiotap headers, 80211 headers and yodel payload 
     #print(data,"radaa")
+    
     for i in range(repeats):
         # print(data)
         # print(len(data))
@@ -107,7 +149,7 @@ def listenrecv():
     if fcs == 2: #if fcs flag is set then remove the fcs which is the last 4 bytes
         data = data[0:-4] 
     #print(fcs)
-
+   
     
     #print(radiolen,"rlen")
 
@@ -136,33 +178,38 @@ def listenrecv():
     if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
         #print("passed1")
         #print(payload,"payload")
-
+        
         rdata = framedecode.is_recipient(data,radiolen)
         
         #print(rdata)
         if rdata:
             isr,dorelay = rdata
             #print(payload[21:],isr,dorelay,"data")
+            #print(rdata)
             if dorelay:
                 relayFrame(payload[5:]) #16+5
             if isr:
+               
                 return(payload[5:])    
         
     return(None)
 
 
-outgoing = LifoQueue(maxsize=64) #stores pending outgoing messages, will be emptied by threaded sender
-incoming = LifoQueue(maxsize=16) #stores pending incoming messages, filled by threaded application, when listen is called the oldest frame still be stored is returned
 
 
 def send(payload, **kwargs):
     global outgoing,outgoing_data
-    
+    #print(type(payload))
     name = kwargs.get("name", '')
     group = kwargs.get("group", '')
     mtype = kwargs.get("type", '')
     #fframe = formPacket(name, group, payload)
     #fill in fields for outgoing_data structure
+
+    if type(payload) == section:
+        mtype = payload.format.mtype
+        payload= bytes(payload)
+        
     if name:
         outgoing_data.Rname = name
     else:
@@ -172,33 +219,36 @@ def send(payload, **kwargs):
     else:
         outgoing_data.Gname = ""
     if mtype:
-        outgoing_data.type = mtype
+        outgoing_data.mtype = mtype
     else:
-        outgoing_data.type = ""
+        outgoing_data.mtype = ""
     outgoing_data.Sname = globaldat.robotName
     outgoing_data.mid = random.randint(0,4294967296)
     outgoing_data.payload = typeManagment(payload)
+
     fframe = bytes(outgoing_data) #get bytes
     #print(fframe)
     oframe = frameStruct(fframe)
     oframe.repeats=globaldat.totalsends
+    #print(__name__ == )
+    outgoing_data.print()
     outgoing.put(oframe)
     # sendData(fframe,iface,totalsends)
 
 
-def sender():
+def sender(outgoing):
     #print("s")
-    global outgoing
+    #global outgoing
 
     while True:
 
-        if not outgoing.empty():
+        
 
-            frame = outgoing.get()
+        frame = outgoing.get()
 
-            reps = frame.repeats
-            dat = frame.bytes
-            sendData(dat, globaldat.iface, reps)
+        reps = frame.repeats
+        dat = frame.bytes
+        sendData(dat, globaldat.iface, reps)
             # print(frame)
 
 
@@ -208,23 +258,29 @@ def sender():
 
 def listen():
     global incoming
-    if not incoming.empty():    
-        frame = incoming.get()
+    try: 
+        frame = incoming.get(False)
         data = frame.frame
         data = decode(data,standardformats.standard_header_format) #this is bad/slow, fix later ###################################################################################################
         return(data)
-    else:
+    except:
+        #print("nothing",__name__)
         return(None)
 
-def receiver():
-    global incoming
+def receiver(incoming,incoming_settings):
+    #global incoming
     globaldat.s.settimeout(.01)
     while True:
-        time.sleep(globaldat.delay)
+        if incoming_settings.poll(0):
+            settings = incoming_settings.recv()
+            setting_update(settings[0],settings[1])
+
+
         dat = listenrecv()
+        #print(dat)
         if dat != None:
             formatted = frameRecv(dat)
-
+            
             incoming.put(formatted)
 
             if incoming.full():

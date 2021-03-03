@@ -2,11 +2,11 @@ from yodel.dynamicheaders import *
 
 
 standard_header = [ #begins all messages
-    field("mid",int,4294967296), #message id
-    field("Rname",str,255), #receiver name
-    field("Gname",str,255), #group identifier
-    field("Sname",str,255), #sender name
-    field("mtype",int,255)  #message type
+    field("mid",int,bytes=4), #message id
+    field("Rname",str,bytes=255), #receiver name
+    field("Gname",str,bytes = 255), #group identifier
+    field("Sname",str,bytes = 255), #sender name
+    field("mtype",int,bytes = 1)  #message type
 ]
 
 

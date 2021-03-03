@@ -1,5 +1,5 @@
 
-
+print("test")
 
 lastMessages = []
 # iface = "wlx000f600a2d3e"
@@ -19,6 +19,9 @@ s = False
 debug = True
 sendert = 0
 receivert = 0
+receiver_pipe = False
+sender_pipe = False
+outgoing = False
 
 def getInt(bytea):
     #print(bytea,"byteea")
