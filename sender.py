@@ -49,30 +49,24 @@ def sendData(packet, current_iface, repeats):
     ftype = b'\x08\x00'
     dur = b'\x00\x00'
     src = b'\x08\x00\x27\x8e\x75\x44'  #random hex stream, could be used as additional space of bits
-
     dst = b'\xff\xff\xff\xff\xff\xff'  # broadcast address is used to stop certain drivers retransmitting frames
     bssid = src
     sn = (random.randint(0, 4096)) #semi unique id, annoyingly not usable due to lack of bits for this application. 
     sn = sn << 4
     seq = sn.to_bytes(4, 'little')
-
-    
     header80211 = ftype + dur + dst + src + bssid + seq
 
     ##########
 
     data = globaldat.radiotap + header80211 + b"\x72\x6f\x62\x6f\x74"+packet #attach radiotap headers, 80211 headers and yodel payload 
 
-    
     for i in range(repeats): #re-transmmit message a couple times
-   
         globaldat.s.send(data) #send the data
 
 
 
 def send(payload, **kwargs):
     global outgoing,outgoing_data
-
 
     name = kwargs.get("name", '')    #receiver name
     group = kwargs.get("group", '')  #receiver group
@@ -87,7 +81,6 @@ def send(payload, **kwargs):
     else:
         outgoing_data.Rname = ""
 
-
     if group: #check for a provided receiving group, otherwise make it blank
         outgoing_data.Gname = group
     else:
@@ -99,9 +92,8 @@ def send(payload, **kwargs):
     else:
         outgoing_data.mtype = 0
 
-
     outgoing_data.Sname = globaldat.robotName #set the Sender name for the outgoing data to be equal to the robots name
-    outgoing_data.mid = random.randint(0,4294967296) #generate random indetifier for the message 
+    outgoing_data.mid = random.randint(-2147483648,2147483647) #generate random indetifier for the message 
     outgoing_data.payload = typeManagment(payload)  #take the payload and convert it to bytes
 
     fframe = bytes(outgoing_data) #get bytes

@@ -7,7 +7,6 @@ import time
 import yodel.globaldat as globaldat
 from yodel.config import *
 from yodel.classes import *
-import yodel.framedecode as framedecode
 from .dynamicheaders import *
 import yodel.standardformats as standardformats
 from .sender import send,sender,sendData,sender_pipe_output
@@ -17,7 +16,7 @@ import atexit
 
 
 @atexit.register
-def on_exit():
+def on_exit(): #was having issues getting built in daemon threads working, this is simple fix
     #print("exiting 21")
     send_to_receiver(["exit",0])
     send_to_sender(["exit",0])

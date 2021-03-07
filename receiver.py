@@ -5,6 +5,8 @@
 # both the stack and pipeline are one way, the stack is used only for sending back data to the main thread, the pipeline is used only for sending instructions to the reciever thread
 #
 
+
+
 from .sender import sendData
 import yodel.globaldat as globaldat
 from .classes import *
@@ -86,7 +88,7 @@ def is_recipient(data,rlen):  #
 
 
 
-def setting_update(setting,value):
+def setting_update(setting,value): #settings handlers for handeling setting changes made by main thread, should mirror function in sender.py
     
     if setting == "name":
         globaldat.robotName = value
@@ -104,7 +106,7 @@ def relayFrame(frame):
     header = b"\x72\x6f\x62\x6f\x74" 
     if globaldat.relay == True:
         # print(frame)
-        sendData(header + frame, globaldat.iface, globaldat.maxRelay)
+        sendData(header + frame, globaldat.iface, globaldat.maxRelay) #this probably will not work? depends on if this is in thread                    -------------check later--------------
 
 
 
@@ -122,7 +124,7 @@ def listenrecv():
         return (None)
     
     radiolen = globaldat.getInt(data[2:3])
-    fcs = data[17]
+    fcs = data[17]#fcs status flag is stored at byte 17
     if fcs == 2: #if fcs flag is set then remove the fcs which is the last 4 bytes
         data = data[0:-4] 
 
@@ -158,10 +160,10 @@ def listenrecv():
 
 def listen():
     global incoming
-    try: 
+    try: #make specific error
         frame = incoming.get(False)
-        data = frame.frame
-        data = decode(data,standardformats.standard_header_format) #this is bad/slow, fix later ###################################################################################################
+        data = frame.frame   #take bytes from message
+        data = decode(data,standardformats.standard_header_format)# take bytes and extract header info
         return(data)
     except:
         #print("nothing",__name__)

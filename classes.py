@@ -1,8 +1,8 @@
 import time
-class frameRecv:
+class frameRecv: # this is used to store messages in the stack that are recieved by the reciever thread
     def __init__(self, frame):
-        self.frame = frame
-        self.time = time.time()
+        self.frame:bytearray = frame  #raw message bytes
+        self.time:int = time.time()   #time message is received 
 
 
 class fmeta:

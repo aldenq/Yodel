@@ -22,7 +22,6 @@ def enableRelay(state):
     #global relay
     globaldat.relay = state
 
-
 def disableRelay():
     #global relay
     globaldat.relay = False

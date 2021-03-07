@@ -68,11 +68,11 @@ class format:  #header objects are objects that store the meta data and encoding
  
     
     def __init__(self, fields,**kwargs):
-        self.mtype = kwargs.get("mtype", 0)
+        self.mtype = kwargs.get("mtype", 0) #get message type
        
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
         self.fields = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
-        self.output = {}
+        self.output = {} #dict that holds field names and values, this is so that sections on init can just copy the info from here rather than regenerating it
         for i in range(len(fields)): #copy data over and init output with field names
             fname = fields[i].name
             self.output[fname] = 0
@@ -132,6 +132,8 @@ class section:
             elif field_type == bytearray:
                  print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}")
         print(f"payload:{' '*space}{self.payload}" )
+
+
     def __bytes__(self):
         return(evalBytes(self.__dict__["fields"],self.__dict__["format"],self.__dict__["payload"]))
     
@@ -143,7 +145,7 @@ class section:
             self.__dict__["payload"] = value
         
     
-    def __getattr__(self, name):
+    def __getattr__(self, name): 
         #print(name,"name")
         if name != "payload":
             return(self.fields[name])
@@ -161,19 +163,10 @@ class section:
         return(str(self.fields))
 
     def __init__(self,format):
-        self.__dict__["format"] = format
-        self.__dict__["fields"] = copy.copy(format.output)
+        self.__dict__["format"]:format = format #store format so that it can be accessed later as necessary
+        self.__dict__["fields"]:dict = copy.copy(format.output)  #copy empty dict from format which has names already set
         self.__dict__["payload"]:bytearray= b'' #holds anything that comes after all fields have been filled
-        '''for i in list(format.fields_dict.keys()):
-            #print(self.__dict__.keys())
-            if format.fields_dict[i].type==flags: #some fields are using classes instead of data types, these need to be hard coded
-                lookup  = format.fields_dict[i].lookup
-                self.__dict__["fields"][i] = flags(lookup)
-            
-            #elif format.fields_dict[i].type==payload:
-                #self.__dict__["fields"][i] = payload()
-            else:
-                self.__dict__["fields"][i] = 0'''
+
 
 
 
@@ -206,7 +199,7 @@ class field:  #used to create new fields, a field being a section of memory mean
             else:
                 self.len = math.ceil((Max-Min).bit_length()/8) #when type is an int len tells us the amount of bits needed to represent the possble options. when type is a str len tells us the amount of bits needed to store the length of the string
             #self.len  =4
-        elif Type == str or Type == bytearray:
+        elif Type == str or Type == bytearray: #
             if bytes_len:
                 Max = bytes_len
             self.min = Min
@@ -219,7 +212,7 @@ class field:  #used to create new fields, a field being a section of memory mean
                 self.max = 0
                 self.len = 1 #flags type is always one byte long
                 if len(args) == 1:
-                    self.lookup = args[0]
+                    self.lookup = args[0]  #take the array that holds the bit names
                 else:
                     self.lookup = False
         '''
