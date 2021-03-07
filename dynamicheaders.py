@@ -57,38 +57,30 @@ class flags:  #class meant to be used in fields, is an array of bools, used to s
             out += val
         return(out)
     
-class format:  #takes in a list of fields and turns them into a format
-    supported_types = [int,str,bytearray,flags]
 
 
-    def gen_data(self):
-        self.output = {}
-        for i in list(self.fields_dict.keys()):
-            #print(self.__dict__.keys())
-            if self.fields_dict[i].type==flags: #some fields are using classes instead of data types, these need to be hard coded
-                lookup  = self.fields_dict[i].lookup
-                self.output[i] = flags(lookup)
-            
-            #elif format.fields_dict[i].type==payload:
-                #self.__dict__["fields"][i] = payload()
-            else:
-                self.output[i] = 0
+
+
+class format:  #header objects are objects that store the meta data and encoding data for a given format. they are needed for encoding and decoding.
+    supported_types = [int,str,bytearray,flags] 
+
+
+ 
     
     def __init__(self, fields,**kwargs):
         self.mtype = kwargs.get("mtype", 0)
-        #print(self.mtype)
+       
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
         self.fields = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
         self.output = {}
-        for i in range(len(fields)):
+        for i in range(len(fields)): #copy data over and init output with field names
             fname = fields[i].name
-            #if fname in self.fields_dict:
-                #print("warn: header name repeat.")
-            self.fields_dict[fname] = fields[i]
+            self.output[fname] = 0
+            self.fields_dict[fname] = fields[i] 
 
 
-        self.gen_data()
-        #print(self.fields_dict)
+        #self.gen_data()
+        
 
 
         
@@ -115,8 +107,8 @@ class section:
             dat_len = len(str(self.fields[i]))
             space2 = 20
             #print(dir(self.__dict__["format"].fields_dict[i]))
-            print(self.__dict__["format"].fields_dict[i].len)
-            print("a")
+            #print(self.__dict__["format"].fields_dict[i].len)
+            #print("a")
             field_type  = self.__dict__["format"].fields_dict[i].type
             #print(objt)
             
@@ -171,7 +163,7 @@ class section:
     def __init__(self,format):
         self.__dict__["format"] = format
         self.__dict__["fields"] = copy.copy(format.output)
-        self.__dict__["payload"]= b''
+        self.__dict__["payload"]:bytearray= b'' #holds anything that comes after all fields have been filled
         '''for i in list(format.fields_dict.keys()):
             #print(self.__dict__.keys())
             if format.fields_dict[i].type==flags: #some fields are using classes instead of data types, these need to be hard coded
@@ -208,7 +200,9 @@ class field:  #used to create new fields, a field being a section of memory mean
                 #print("bf")
                 self.len = bytes_len
                 #print(self.len,"flen",bytes_len)
-                self.max = 2**(bytes_len*8)-1
+                self.min = -1 * 2**((bytes_len*8)-1)  #signed integers are encoded using sign and magnitude
+                self.max = 2**((bytes_len*8)-1)-1
+                #print(self.min,self.max, "min,max")
             else:
                 self.len = math.ceil((Max-Min).bit_length()/8) #when type is an int len tells us the amount of bits needed to represent the possble options. when type is a str len tells us the amount of bits needed to store the length of the string
             #self.len  =4
@@ -295,8 +289,8 @@ def decode(data,encoding):
             output[fname] = fout
             
         elif ftype == flags: 
-            
-            fout = list(bin(globaldat.getInt(fdata))[2:]) #because this is python the only way to turn a byte into a list of bytes is to first convert it to an int, convert it to a utf-8 encoded string of bits, and split that list, than convert all the terms into ints and return that as a list
+            output[fname] = flags([])
+            fout = list(bin(globaldat.getInt(fdata))[2:]) #because this is python the only way to turn a byte into a list of bits is to first convert it to an int, convert it to a utf-8 encoded string of bits, and split that list, than convert all the terms into ints and return that as a list
             fout= list(map(int,fout))
             fout = [0]*(8-len(fout)) + fout #add appropriate 0 padding depedning on the length
             
@@ -317,8 +311,10 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
     #field_dict is a dictionary where the keys are field names, and the values are the values of those fields
     
     out = b'' #output is bytearray
+    #print(field_dict,"fdata")
     for i in format.fields_dict.keys():
         field_data = field_dict[i]
+        
         format_field = format.fields_dict[i]  #take the field from the format
         field_type = format_field.type #get the expected data type of the field
         #print(field_type)
@@ -330,10 +326,12 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
             
             if field_type == int:   
                 #the amount of bytes for the int is included in the standard so it does not need to be added to the output
-                
+                #print(field_data,flen ,format_field.min,i, "field_data,field_len")
                 field_data -= format_field.min
-                #print(field_data,flen)
+                #print(field_data,flen) 
+                
                 out += field_data.to_bytes(flen, 'little')
+                 
                 #print(field_data.to_bytes(flen, 'little'),"int dat")
             elif field_type == flags: #flags are always 1 byte
                 out += bytes(field_data)
@@ -345,6 +343,7 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
 
                 #print(flen,field_len,"string")
                 out += field_len.to_bytes(flen, 'little') #for string the length of the string first needs to be added as an int before the string data
+               
                 out += bytearray(field_data.encode(encoding='UTF-8', errors='strict')) #strings are encoded as a utf-8 string
                 
             elif field_type == bytearray:
