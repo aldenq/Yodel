@@ -111,13 +111,13 @@ first, some example code to ground this:
 ``` python
 lighting_header = [
     
-    yodel.field("lights",yodel.Flags,["red","green","yellow"])
+    yodel.Field("lights",yodel.Flags,["red","green","yellow"])
     
 ]
-lighting_format = yodel.format(lighting_header)
+lighting_format = yodel.Format(lighting_header)
 
 
-lighting_data = yodel.section(lighting_format)
+lighting_data = yodel.Section(lighting_format)
 
 
 lighting_data.lights["red"] = True
