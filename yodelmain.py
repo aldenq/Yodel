@@ -80,3 +80,10 @@ def startRadio(interf): #all functions needed to initiate radios
 
 
 
+def restartThreads():
+    
+    send_to_receiver(["exit",0])
+    send_to_sender(["exit",0])
+    globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
+    globaldat.sender_pipe, sender_pipe_output = mp.Pipe() 
+    setupThreads()
