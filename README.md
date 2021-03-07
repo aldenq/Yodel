@@ -111,7 +111,7 @@ first, some example code to ground this:
 ``` python
 lighting_header = [
     
-    yodel.field("lights",yodel.flags,["red","green","yellow"])
+    yodel.field("lights",yodel.Flags,["red","green","yellow"])
     
 ]
 lighting_format = yodel.format(lighting_header)
@@ -123,7 +123,7 @@ lighting_data = yodel.section(lighting_format)
 lighting_data.lights["red"] = True
 ```
 
-  #### yodel.field()
+  #### yodel.Field()
     defines a data field, fields are used to create larger structs, the exact parameters you will have to provide depend on the field type you use
     here are some examples:
     yodel.field("distance",int,bytes=2)
@@ -132,12 +132,12 @@ lighting_data.lights["red"] = True
      yodel.field("misc_data",yodel.flags) 
 
 
-  #### yodel.format(field list)
+  #### yodel.Format(field list)
     this function takes in a list of fields and converts it into a format object, this format object can later be used to decode incoming bytes or create 
     and store new data in the selected format.
 
 
-  #### yodel.section(format)
+  #### yodel.Section(format)
     sections are empty objects with attributes for each field in the provided format. they are designed to be filled with data and then sent via yodel.send.
     
 
