@@ -23,7 +23,7 @@ globaldat.outgoing = mp.Queue()
 
 
 #####template that gets filled whenever send is called. this is to avoid having to generate a new class object every time send is called
-outgoing_data = section(standardformats.standard_header_format)
+outgoing_data = Section(standardformats.standard_header_format)
 
 def setting_update(setting,value):
     
@@ -70,9 +70,9 @@ def send(payload, **kwargs):
 
     name = kwargs.get("name", '')    #receiver name
     group = kwargs.get("group", '')  #receiver group
-    mtype = kwargs.get("type", '')   #message type
+    mtype = 0#kwargs.get("type", '')   #message type
   
-    if type(payload) == section: #if type is a section than it can be processed automatically 
+    if type(payload) == Section: #if type is a section than it can be processed automatically 
         mtype = payload.format.mtype
         payload= bytes(payload)
         
@@ -87,10 +87,10 @@ def send(payload, **kwargs):
         outgoing_data.Gname = ""
 
 
-    if mtype: #check if a message type has been selected
-        outgoing_data.mtype = mtype
-    else:
-        outgoing_data.mtype = 0
+    #if mtype: #check if a message type has been selected
+    #    outgoing_data.mtype = mtype
+    #else:
+    #    outgoing_data.mtype = 0
 
     outgoing_data.Sname = globaldat.robotName #set the Sender name for the outgoing data to be equal to the robots name
     outgoing_data.mid = random.randint(-2147483648,2147483647) #generate random indetifier for the message 
@@ -98,7 +98,7 @@ def send(payload, **kwargs):
 
     fframe = bytes(outgoing_data) #get bytes
     
-    oframe = frameStruct(fframe)
+    oframe = FrameStruct(fframe)
     oframe.repeats=globaldat.totalsends
     #print(__name__ == )
     #outgoing_data.print()

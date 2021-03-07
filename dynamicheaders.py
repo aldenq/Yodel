@@ -8,7 +8,7 @@ def typeManagment(data):
     elif dtype == bytes:
         return(data) 
         
-class flags:  #class meant to be used in fields, is an array of bools, used to store flags about the packet
+class Flags:  #class meant to be used in fields, is an array of bools, used to store flags about the packet
     # 
     #
     length = 1
@@ -61,17 +61,17 @@ class flags:  #class meant to be used in fields, is an array of bools, used to s
 
 
 
-class format:  #header objects are objects that store the meta data and encoding data for a given format. they are needed for encoding and decoding.
-    supported_types = [int,str,bytearray,flags] 
+class Format:  #header objects are objects that store the meta data and encoding data for a given format. they are needed for encoding and decoding.
+    supported_types = [int,str,bytearray,Flags] 
 
 
  
     
     def __init__(self, fields,**kwargs):
-        self.mtype = kwargs.get("mtype", 0) #get message type
+        self.mtype:int = kwargs.get("mtype", 0) #get message type
        
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
-        self.fields = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
+        self.fields:list = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
         self.output = {} #dict that holds field names and values, this is so that sections on init can just copy the info from here rather than regenerating it
         for i in range(len(fields)): #copy data over and init output with field names
             fname = fields[i].name
@@ -85,7 +85,7 @@ class format:  #header objects are objects that store the meta data and encoding
 
         
     
-class section:
+class Section:
     #resvd = []
     #intern = {}
     #flds = {}
@@ -95,7 +95,7 @@ class section:
         type_lookup = {
         bytearray:"Bytearray",
         int:"Int",
-        flags:"Flags",
+        Flags:"Flags",
         bytes:"bytes",
         str:"String"
         }
@@ -127,7 +127,7 @@ class section:
                 print(f"{i}:{' '*space}\"{self.fields[i]}\"{' '*(space2 - 2)}{print_type}") #print rules for strings
             elif field_type == int:    
                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}") #print rules for ints
-            elif field_type == flags:    
+            elif field_type == Flags:    
                 print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}     {list(self.fields[i].lookup.keys())}") #print rules for flags
             elif field_type == bytearray:
                  print(f"{i}:{' '*space}{self.fields[i]}{' '*(space2)}{print_type}")
@@ -176,10 +176,10 @@ class section:
 
 
 
-class field:  #used to create new fields, a field being a section of memory meant to hold one value
+class Field:  #used to create new fields, a field being a section of memory meant to hold one value
     def __init__(self,Name,Type,*args,**kwargs):
         #print(Name,Type)
-        bytes_len = kwargs.get("bytes", False)
+        bytes_len:int = kwargs.get("bytes", False)
         Min = kwargs.get("min", 0)
         Max = kwargs.get("max", False)
         #self.type = Type
@@ -207,12 +207,12 @@ class field:  #used to create new fields, a field being a section of memory mean
             
             self.len = math.ceil((Max-Min).bit_length()/8)
            
-        elif Type == flags:
+        elif Type == Flags:
                 self.min= 0
                 self.max = 0
                 self.len = 1 #flags type is always one byte long
                 if len(args) == 1:
-                    self.lookup = args[0]  #take the array that holds the bit names
+                    self.lookup = args[0]  #take the array that holds the bit names 
                 else:
                     self.lookup = False
         '''
@@ -247,7 +247,7 @@ class field:  #used to create new fields, a field being a section of memory mean
         
 def decode(data,encoding):
     fnames = list(encoding.fields_dict.keys()) #returns list of all field names
-    output = section(encoding) #generate new section object to store output
+    output = Section(encoding) #generate new section object to store output
     cpos = 0 #current position, sort of a pointer to the bytearray
     for field in range(len(fnames)):
         fname = fnames[field] #field name
@@ -281,8 +281,8 @@ def decode(data,encoding):
             fout += fmin
             output[fname] = fout
             
-        elif ftype == flags: 
-            output[fname] = flags([])
+        elif ftype == Flags: 
+            output[fname] = Flags([])
             fout = list(bin(globaldat.getInt(fdata))[2:]) #because this is python the only way to turn a byte into a list of bits is to first convert it to an int, convert it to a utf-8 encoded string of bits, and split that list, than convert all the terms into ints and return that as a list
             fout= list(map(int,fout))
             fout = [0]*(8-len(fout)) + fout #add appropriate 0 padding depedning on the length
@@ -326,7 +326,7 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
                 out += field_data.to_bytes(flen, 'little')
                  
                 #print(field_data.to_bytes(flen, 'little'),"int dat")
-            elif field_type == flags: #flags are always 1 byte
+            elif field_type == Flags: #flags are always 1 byte
                 out += bytes(field_data)
                 
             elif field_type == str: 

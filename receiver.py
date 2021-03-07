@@ -28,7 +28,7 @@ globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
 
 
 
-def is_recipient(data,rlen):  #
+def is_recipient(data,rlen):  #check to see if a given message is intended for this computer, either to receive or to relay
     
     # print(lastMessages)
     
@@ -184,7 +184,7 @@ def receiver(incoming,pipe):
         
         #print(dat)
         if dat != None:
-            formatted = frameRecv(dat)
+            formatted = FrameRecv(dat)
             
             incoming.put(formatted)
 

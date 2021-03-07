@@ -1,5 +1,4 @@
 
-print("test")
 
 lastMessages = []
 # iface = "wlx000f600a2d3e"

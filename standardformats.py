@@ -2,23 +2,23 @@ from yodel.dynamicheaders import *
 
 
 standard_header = [ #begins all messages
-    field("mid",int,bytes=4), #message id
-    field("Rname",str,bytes=255), #receiver name
-    field("Gname",str,bytes = 255), #group identifier
-    field("Sname",str,bytes = 255), #sender name
-    field("mtype",int,bytes = 1)  #message type
+    Field("mid",int,bytes=4), #message id
+    Field("Rname",str,bytes=255), #receiver name
+    Field("Gname",str,bytes = 255), #group identifier
+    Field("Sname",str,bytes = 255), #sender name
+    Field("mtype",int,bytes = 1)  #message type
 ]
 
 
 
 request = [  #mtype: 1
-    field("request",str,255),
+    Field("request",str,255),
 ]
 response = [ #mtype: 2
-    field("response",str,255),
+    Field("response",str,255),
 ]
 
 
 
-standard_header_format = format(standard_header)
+standard_header_format = Format(standard_header)
 
