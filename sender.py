@@ -54,7 +54,7 @@ def sendData(packet, current_iface, repeats):
     src = b'\x08\x00\x27\x8e\x75\x44'  #random hex stream, could be used as additional space of bits
     dst = b'\xff\xff\xff\xff\xff\xff'  # broadcast address is used to stop certain drivers retransmitting frames
     bssid = src
-    sn = (random.randint(0, 4096)) #semi unique id, annoyingly not usable due to lack of bits for this application. 
+    sn = (random.randint(0, 4096)) #semi unique id, annoyingly not usable due to lack of bits for this application.  -----fix this -----
     sn = sn << 4
     seq = sn.to_bytes(4, 'little')
     header80211 = ftype + dur + dst + src + bssid + seq
@@ -68,7 +68,7 @@ def sendData(packet, current_iface, repeats):
 
 
 
-def send(payload,name = "",group =""):
+def send(payload,name:str = "",group:str =""):
     global outgoing,outgoing_data
 
     #name = kwargs.get("name", '')    #receiver name

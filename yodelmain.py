@@ -18,6 +18,7 @@ import atexit
 @atexit.register
 def on_exit(): #was having issues getting built in daemon threads working, this is simple fix
     #print("exiting 21")
+    time.sleep(globaldat.socketCloseTime) #give threads a moment to finish up what they are doing
     send_to_receiver(["exit",0])
     send_to_sender(["exit",0])
 #print(framedecode.__file__)

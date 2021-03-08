@@ -76,6 +76,7 @@ def setChannel(channel):  # set the channel for the interface, some drivers only
 
 
 def setPower(txdBm):
+    #3500 is not necessarily a legal or safe power level for your hardware, the limiter is just to marginally decrease the odds of causing problems. 
     if txdBm > 3500:
         txdBm = 3500
         print("power level is set too high")

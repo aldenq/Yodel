@@ -23,7 +23,7 @@ sender_pipe = False
 outgoing = False
 
 messages_types = [0]*256
-
+socketCloseTime = .1 #how much time in seconds the threads have to finish what they are doing once the program ends
 
 
 def getInt(bytea):

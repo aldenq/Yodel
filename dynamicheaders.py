@@ -72,7 +72,7 @@ class Format:
 
  
     
-    def __init__(self, fields,mtype=0):
+    def __init__(self, fields,mtype:int=0):
         self.mtype:int = mtype#kwargs.get("mtype", 0) #get message type
         
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
@@ -361,7 +361,8 @@ def autoDecode(data):
         byte_data = data.payload
         #print(mtype)
         return(decode(byte_data,globaldat.messages_types[mtype]))
-        
+    else:
+        return(data.payload)
 
 
 
