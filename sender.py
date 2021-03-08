@@ -40,7 +40,7 @@ def setting_update(setting,value):
         print("exit sender")
         exiting = True
         #exist_start = 
-        #sys.exit()
+        sys.exit()
 
 
 
