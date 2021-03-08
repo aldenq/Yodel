@@ -24,7 +24,7 @@ this will be needed in the "yodel.startRadio" function call in your code.
 
 ### RADIO CONFIGURATION:
 
-  #### yodel.setInterface(str)
+  #### yodel.startRadio(str)
   
     set the interface that yodel should operate on, will auto configure that interface.
     interfaces need to support monitor mode and packet injection. 
