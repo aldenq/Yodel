@@ -58,15 +58,16 @@ def on_exit(): #was having issues getting built in daemon threads working, this 
 def setupThreads():
     
     global sendert,receivert,outgoing,incoming
-  
+    #print("startingt")
     
     sendert = mp.Process(target=sender, args=(globaldat.outgoing,sender_pipe_output,))
     sendert.daemon = True
-
+    sendert.start()
+    #print("startingt2")
     receivert = mp.Process(target=receiver, args=(incoming,receiver_pipe_output,))
     receivert.daemon = True
     receivert.start()
-    sendert.start()
+    
     
 
 def startRadio(interf): #all functions needed to initiate radios 

@@ -69,10 +69,14 @@ class Format:  #header objects are objects that store the meta data and encoding
     
     def __init__(self, fields,**kwargs):
         self.mtype:int = kwargs.get("mtype", 0) #get message type
-       
+        
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
         self.fields:list = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
         self.output = {} #dict that holds field names and values, this is so that sections on init can just copy the info from here rather than regenerating it
+
+        if self.mtype != 0:
+            globaldat.messages_types[self.mtype] = self
+            #print(self)
         for i in range(len(fields)): #copy data over and init output with field names
             fname = fields[i].name
             self.output[fname] = 0
@@ -359,6 +363,13 @@ def evalBytes(field_dict, format,payload): #used in the __bytes__ method in the 
     return(out)
 
 
+def autoDecode(data):
+    mtype = data.mtype
+    if mtype != 0 :
+        byte_data = data.payload
+        #print(mtype)
+        return(decode(byte_data,globaldat.messages_types[mtype]))
+        
 
 
 

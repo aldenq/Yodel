@@ -24,9 +24,10 @@ globaldat.outgoing = mp.Queue()
 
 #####template that gets filled whenever send is called. this is to avoid having to generate a new class object every time send is called
 outgoing_data = Section(standardformats.standard_header_format)
-
+exiting = False
+exist_start = 0
 def setting_update(setting,value):
-    
+    global exiting,exist_start
     if setting == "name":
         globaldat.robotName = value
     elif setting == "add_group":
@@ -37,7 +38,9 @@ def setting_update(setting,value):
         clearGroups()
     elif setting == "exit":
         print("exit sender")
-        sys.exit()
+        exiting = True
+        #exist_start = 
+        #sys.exit()
 
 
 
@@ -59,7 +62,7 @@ def sendData(packet, current_iface, repeats):
     ##########
 
     data = globaldat.radiotap + header80211 + b"\x72\x6f\x62\x6f\x74"+packet #attach radiotap headers, 80211 headers and yodel payload 
-
+    print("sending...")
     for i in range(repeats): #re-transmmit message a couple times
         globaldat.s.send(data) #send the data
 
@@ -74,6 +77,7 @@ def send(payload, **kwargs):
   
     if type(payload) == Section: #if type is a section than it can be processed automatically 
         mtype = payload.format.mtype
+        print(mtype)
         payload= bytes(payload)
         
     if name: #check for a provided receiver name otherwise make it blank
@@ -95,29 +99,32 @@ def send(payload, **kwargs):
     outgoing_data.Sname = globaldat.robotName #set the Sender name for the outgoing data to be equal to the robots name
     outgoing_data.mid = random.randint(-2147483648,2147483647) #generate random indetifier for the message 
     outgoing_data.payload = typeManagment(payload)  #take the payload and convert it to bytes
-
+    outgoing_data.mtype = mtype
     fframe = bytes(outgoing_data) #get bytes
     
     oframe = FrameStruct(fframe)
     oframe.repeats=globaldat.totalsends
     #print(__name__ == )
     #outgoing_data.print()
+    print("sending3")
     globaldat.outgoing.put(oframe)
     # sendData(fframe,iface,totalsends)
 
 
 def sender(outgoing,pipe): #thread that manages sending out data
-   
+    #print("init0")
     while True:
         #print("test1")
+        #print("state0")
         if pipe.poll(0): #check for any new settings updates or other instructions from the main thread
             #print("data received")
             settings = pipe.recv() #if there are any then receive them
             setting_update(settings[0],settings[1]) #use these as inputs to the settings update function
         
-
+        print("waiting...")
+        
         frame = outgoing.get() #wait for data in stack to be sent (is blocking)
-
+        print("found")
         reps = frame.repeats
         dat = frame.bytes
         sendData(dat, globaldat.iface, reps)

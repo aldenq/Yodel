@@ -22,6 +22,10 @@ receiver_pipe = False
 sender_pipe = False
 outgoing = False
 
+messages_types = [0]*256
+
+
+
 def getInt(bytea):
     #print(bytea,"byteea")
     return (int.from_bytes(bytea, byteorder='little'))

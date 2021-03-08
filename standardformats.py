@@ -6,7 +6,7 @@ standard_header = [ #begins all messages
     Field("Rname",str,bytes=255), #receiver name
     Field("Gname",str,bytes = 255), #group identifier
     Field("Sname",str,bytes = 255), #sender name
-    Field("mtype",int,bytes = 1)  #message type
+    Field("mtype",int,bytes = 1)  #message type 
 ]
 
 
