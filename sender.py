@@ -62,7 +62,7 @@ def sendData(packet, current_iface, repeats):
     ##########
 
     data = globaldat.radiotap + header80211 + b"\x72\x6f\x62\x6f\x74"+packet #attach radiotap headers, 80211 headers and yodel payload 
-    print("sending...")
+    #print("sending...")
     for i in range(repeats): #re-transmmit message a couple times
         globaldat.s.send(data) #send the data
 
@@ -77,7 +77,7 @@ def send(payload, **kwargs):
   
     if type(payload) == Section: #if type is a section than it can be processed automatically 
         mtype = payload.format.mtype
-        print(mtype)
+        #print(mtype)
         payload= bytes(payload)
         
     if name: #check for a provided receiver name otherwise make it blank
@@ -106,7 +106,7 @@ def send(payload, **kwargs):
     oframe.repeats=globaldat.totalsends
     #print(__name__ == )
     #outgoing_data.print()
-    print("sending3")
+    #print("sending3")
     globaldat.outgoing.put(oframe)
     # sendData(fframe,iface,totalsends)
 
@@ -121,10 +121,10 @@ def sender(outgoing,pipe): #thread that manages sending out data
             settings = pipe.recv() #if there are any then receive them
             setting_update(settings[0],settings[1]) #use these as inputs to the settings update function
         
-        print("waiting...")
+        #print("waiting...")
         
         frame = outgoing.get() #wait for data in stack to be sent (is blocking)
-        print("found")
+        #print("found")
         reps = frame.repeats
         dat = frame.bytes
         sendData(dat, globaldat.iface, reps)
