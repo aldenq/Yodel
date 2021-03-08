@@ -43,7 +43,7 @@ def addGroup(group):
     globaldat.groups.append(group)
     send_to_receiver(["add_group",group])
     send_to_sender(["add_group",group])
-    
+
 def deleteGroup(group):
     global groups
     if group in groups:
@@ -53,7 +53,7 @@ def deleteGroup(group):
     send_to_sender(["del_group",group])
 
 def getGroups():
-    return (groups)
+    return (globaldat.groups)
 
 
 def clearGroups():

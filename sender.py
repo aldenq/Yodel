@@ -68,11 +68,11 @@ def sendData(packet, current_iface, repeats):
 
 
 
-def send(payload, **kwargs):
+def send(payload,name = "",group =""):
     global outgoing,outgoing_data
 
-    name = kwargs.get("name", '')    #receiver name
-    group = kwargs.get("group", '')  #receiver group
+    #name = kwargs.get("name", '')    #receiver name
+    #group = kwargs.get("group", '')  #receiver group
     mtype = 0#kwargs.get("type", '')   #message type
   
     if type(payload) == Section: #if type is a section than it can be processed automatically 

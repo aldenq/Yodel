@@ -170,19 +170,23 @@ def listen():
         return(None)
 
 def receiver(incoming,pipe):
-    #global incoming
-    #print(__name__,"receiver")
+    """
+    this is the main function in the reciever thread. this checks for new messages and stores them into the stack so that main thread can access them
+    this also checks for settings updates and acts on them
+
+
+    """
     globaldat.s.settimeout(.1)
     while True:
         
-        if pipe.poll(0):
-            settings = pipe.recv()
-            setting_update(settings[0],settings[1])
+        if pipe.poll(0): #check for new data in pipe
+            settings = pipe.recv() #get data
+            setting_update(settings[0],settings[1]) #change settings accordingly 
 
 
         dat = listenrecv()
         
-        #print(dat)
+        
         if dat != None:
             formatted = FrameRecv(dat)
             

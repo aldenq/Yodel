@@ -61,22 +61,27 @@ class Flags:  #class meant to be used in fields, is an array of bools, used to s
 
 
 
-class Format:  #header objects are objects that store the meta data and encoding data for a given format. they are needed for encoding and decoding.
+class Format: 
+    """ formats are used to store the information needed to encode or decode data. eg: first 3 bytes are a string, next 5 are for an int, etc.
+
+    """
+
+
     supported_types = [int,str,bytearray,Flags] 
 
 
  
     
-    def __init__(self, fields,**kwargs):
-        self.mtype:int = kwargs.get("mtype", 0) #get message type
+    def __init__(self, fields,mtype=0):
+        self.mtype:int = mtype#kwargs.get("mtype", 0) #get message type
         
         self.fields_dict = {}  #dictionary that holds field data formated as field name: field value
         self.fields:list = fields   #fields holds the list of fields provided, still holds lots of useful meta data so it is kept around
-        self.output = {} #dict that holds field names and values, this is so that sections on init can just copy the info from here rather than regenerating it
+        self.output:dict = {} #dict that holds field names and values, this is so that sections on init can just copy the info from here rather than regenerating it
 
-        if self.mtype != 0:
+        if self.mtype != 0: #when a format is created and the message type is not zero store it in the array of message types so that autoDecode can use the format
             globaldat.messages_types[self.mtype] = self
-            #print(self)
+       
         for i in range(len(fields)): #copy data over and init output with field names
             fname = fields[i].name
             self.output[fname] = 0
@@ -90,9 +95,18 @@ class Format:  #header objects are objects that store the meta data and encoding
         
     
 class Section:
-    #resvd = []
-    #intern = {}
-    #flds = {}
+    """
+    sections are used to store data and the meta-data needed to encode that data. 
+    to get extract all of the data in a section use:
+    section.fields
+
+    sections can be encoded by using bytes(section), also, if a section is used in yodel.send it will automatically handle it.
+
+
+
+
+
+    """
 
     def print(self): #fancy print 
         
@@ -181,11 +195,11 @@ class Section:
 
 
 class Field:  #used to create new fields, a field being a section of memory meant to hold one value
-    def __init__(self,Name,Type,*args,**kwargs):
+    def __init__(self,Name,Type,*args,bytes=False,Min=False,Max=False):
         #print(Name,Type)
-        bytes_len:int = kwargs.get("bytes", False)
-        Min = kwargs.get("min", 0)
-        Max = kwargs.get("max", False)
+        bytes_len:int =bytes
+        #Min = Min
+        #Max = kwargs.get("max", False)
         #self.type = Type
 
         if Type == int:
@@ -219,29 +233,7 @@ class Field:  #used to create new fields, a field being a section of memory mean
                     self.lookup = args[0]  #take the array that holds the bit names 
                 else:
                     self.lookup = False
-        '''
-        if Type==int or Type == str or Type == bytearray:
-            #print(Name,Type,"2")
-            #min/max: when type is an integer min refers to the smallest possible integer and max refers to the largest
-            #when type is a string or byte array than min refers to the shortest possible str and max refers to the longest possible
-            
-
-
-
-            if blen != None:
-                Min = 0
-
-
-
-
-
-
-            if len(args) == 2:
-                Min,Max = args
-            if len(args) == 1:
-                Max = args[0] #if only one number is given it is assumed to be the max length/ int size and the min is assumed to be zero
-                Min = 0
-        '''
+      
         
         
                 
