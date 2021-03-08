@@ -71,7 +71,7 @@ def is_recipient(data,rlen):  #check to see if a given message is intended for t
         #if globaldat.relay == True and not (name == globaldat.robotName):
         #    relay = True
 
-        
+        #print(nameM,groupM,name,group,globaldat.groups)
         relay = (globaldat.relay == True and not (name == globaldat.robotName))
             #relayFrame(frame)
         return(nameM and groupM,relay)
@@ -93,6 +93,7 @@ def setting_update(setting,value): #settings handlers for handeling setting chan
     if setting == "name":
         globaldat.robotName = value
     elif setting == "add_group":
+        print("groups",value)
         globaldat.groups.append(value)
     elif setting == "del_group":
         deleteGroup(value)
@@ -113,7 +114,7 @@ def relayFrame(frame):
 
 
 
-def listenrecv():
+def listenrecv(pipe):
    
     
     try:
@@ -137,14 +138,16 @@ def listenrecv():
     starth = (payload[pos:pos + 5])
 
     if starth == b"\x72\x6f\x62\x6f\x74":  # radio tap headers are stripped on external frames (non loopback)
+        #print("check")
+        settings_check(pipe) #additionally check for settings change if any yodel data is captured to see if anything important has changed
         rdata = is_recipient(data,radiolen)
-        
+        #print("a")
         if rdata:
             isr,dorelay = rdata
             if dorelay:
                 relayFrame(payload[5:]) #16+5
             if isr:
-               
+                #print(payload)
                 return(payload[5:])    
         
     return(None)
@@ -154,6 +157,11 @@ def listenrecv():
 
 
 
+def settings_check(pipe):
+    if pipe.poll(0): #check for new data in pipe
+            settings = pipe.recv() #get data
+            #print(settings,"setting update")
+            setting_update(settings[0],settings[1]) #change settings accordingly 
 
 
 
@@ -178,13 +186,10 @@ def receiver(incoming,pipe):
     """
     globaldat.s.settimeout(.1)
     while True:
+        #print("new")
         
-        if pipe.poll(0): #check for new data in pipe
-            settings = pipe.recv() #get data
-            setting_update(settings[0],settings[1]) #change settings accordingly 
-
-
-        dat = listenrecv()
+        settings_check(pipe) #check for settings updates
+        dat = listenrecv(pipe)
         
         
         if dat != None:

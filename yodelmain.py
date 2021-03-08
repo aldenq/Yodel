@@ -68,6 +68,7 @@ def setupThreads():
     receivert = mp.Process(target=receiver, args=(incoming,receiver_pipe_output,))
     receivert.daemon = True
     receivert.start()
+    #print("threads started")
     
     
 

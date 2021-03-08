@@ -17,6 +17,7 @@ from yodel.config import *
 
 
 #####setup for communication with sender thread
+#print("init")
 globaldat.sender_pipe, sender_pipe_output = mp.Pipe() 
 globaldat.outgoing = mp.Queue()
 #####

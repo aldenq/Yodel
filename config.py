@@ -5,8 +5,9 @@ import subprocess
 import yodel.globaldat as globaldat
 
 def send_to_receiver(data): #some settings changes require data to be sent to a thread this function takes care of that
+    print("sending to r")
     globaldat.receiver_pipe.send(data)
-
+    print("done")
 
 def send_to_sender(data): #some settings changes require data to be sent to a thread this function takes care of that
     globaldat.sender_pipe.send(data)
