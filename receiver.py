@@ -12,7 +12,7 @@ from .classes import *
 import yodel.standardformats as standardformats
 from .dynamicheaders import *
 from yodel.config import *
-#import yodel.framedecode as framedecode
+from typing import *
 
 
 import sys
@@ -23,34 +23,39 @@ globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
 
 # check to see if a given message is intended for this computer, either to
 # receive or to relay
-def is_recipient(data, rlen):
+def is_recipient(
+        data: bytearray, radiotap_header_length: int) -> Union[bool, Tuple[bool, bool]]:
+    """
+    check to see if a given message is intended for this computer and if the message should be relayed
 
-    # print(lastMessages)
 
-    frame = data[rlen + 26 + 5:]  # get data frame payload section
+
+    @param data: raw bytes for incoming message
+
+    @param radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.
+    """
+
+    # get data frame payload section
+    frame = data[radiotap_header_length + 26 + 5:]
     pos = 0  # pos is used as a pointer to the current section of the header being decoded
-    #ftype = frame[pos:pos+1]
-    # print(frame)
-    # print("abc1234567821A1",__name__)
-    # message id, the semi unique identifer to each message to avoid receiving
-    # them twice
-    mID = frame[pos:pos + 4]
-    # print(__name__)
-    #pos += 1
-    # globaldat.bytesPrint(mID)
-    if mID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
-        return (False)
-    if mID not in globaldat.lastMessages:  # check if message has already been received
 
-        globaldat.lastMid = mID  # set last mid to the current mid
-        # print(mID)
-        globaldat.lastMessages.append(mID)
+    """
+     message id, the semi unique identifer to each message to avoid receiving
+     them twice
+    """
+    message_ID = frame[pos:pos + 4]
+    if message_ID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
+        return (False)
+
+    if message_ID not in globaldat.lastMessages:  # check if message has already been received
+
+        globaldat.lastMid = message_ID  # set last mid to the current mid
+        globaldat.lastMessages.append(message_ID)
         if len(globaldat.lastMessages) > 64:
             del globaldat.lastMessages[0]
 
-        #out = classes.frameStruct(frame)
         pos += 4
-        namelen = globaldat.getInt(frame[pos:pos + 1])
+        namelen = globaldat.getInt(frame[pos:pos + 1])  # get length of name
         pos += 1
 
         name = frame[pos:pos + namelen].decode("utf-8")
@@ -63,45 +68,37 @@ def is_recipient(data, rlen):
         pos += gnamelen
 
         groupM = (group in globaldat.groups or gnamelen == 0)
-        # if globaldat.relay == True and not (name == globaldat.robotName):
-        #    relay = True
 
-        # print(nameM,groupM,name,group,globaldat.groups)
         relay = (globaldat.relay == True and not (name == globaldat.robotName))
-        # relayFrame(frame)
+
         return(nameM and groupM, relay)
 
     return (False)
-    # print((namelen))
 
 
-# settings handlers for handeling setting changes made by main thread,
-# should mirror function in sender.py
-def setting_update(setting, value):
-
-    if setting == "name":
-        globaldat.robotName = value
-    elif setting == "add_group":
-        print("groups", value)
-        globaldat.groups.append(value)
-    elif setting == "del_group":
-        deleteGroup(value)
-    elif setting == "clr_group":
-        clearGroups()
-    elif setting == "exit":
-        print("exiting")
-        sys.exit()
+def relayFrame(frame: bytearray) -> NoReturn:
+    """
+    used to allow receiver thread to relay messages back out
 
 
-def relayFrame(frame):
-    header = b"\x72\x6f\x62\x6f\x74"
-    if globaldat.relay == True:
-        # print(frame)
-        # this probably will not work? depends on if this is in thread
-        sendData(header + frame, globaldat.iface, globaldat.maxRelay)
+    @params frame: bytes of message being relayed
+
+    """
+
+    header = b"\x72\x6f\x62\x6f\x74"  # yodel identifier
+    if globaldat.relay == True:  # check if relay is enabled
+
+        # format and pass data to sender thread
+        sendData(header + frame, globaldat.maxRelay)
 
 
-def listenrecv(pipe):
+def listenrecv(pipe: mp.Pipe) -> bytearray:
+    """
+    listen for yodel messages, check if the are meant for this computer and if so receive them
+
+
+    @params pipe: same pipe as in receiver, used to check for settings updates
+    """
 
     try:
 
@@ -128,26 +125,33 @@ def listenrecv(pipe):
         # to see if anything important has changed
         settings_check(pipe)
         rdata = is_recipient(data, radiolen)
-        # print("a")
+
         if rdata:
             isr, dorelay = rdata
             if dorelay:
-                relayFrame(payload[5:])  # 16+5
+                relayFrame(payload[5:])
             if isr:
-                # print(payload)
+
                 return(payload[5:])
 
     return(None)
 
 
-def settings_check(pipe):
+def settings_check(pipe) -> NoReturn:
+    """ reads from pipe to detect settings updates
+
+    @params pipe: same settings pipe as used in receiver
+    """
     if pipe.poll(0):  # check for new data in pipe
         settings = pipe.recv()  # get data
         #print(settings,"setting update")
         setting_update(settings[0], settings[1])  # change settings accordingly
 
 
-def listen():
+def listen() -> Section:
+    """
+    used to listen for data being sent to your robot, is non-blocking
+    """
     global incoming
     try:  # make specific error
         frame = incoming.get(False)
@@ -156,20 +160,23 @@ def listen():
         data = decode(data, standardformats.standard_header_format)
         return(data)
     except BaseException:
-        # print("nothing",__name__)
+
         return(None)
 
 
-def receiver(incoming, pipe):
+def receiver(incoming: mp.Queue, pipe: mp.Pipe) -> NoReturn:
     """
     this is the main function in the reciever thread. this checks for new messages and stores them into the stack so that main thread can access them
     this also checks for settings updates and acts on them
 
 
+
+    @params incoming: queue that main thread reads from to receive new messages
+
+    @params pipe: settings updates
     """
     globaldat.s.settimeout(.1)
     while True:
-        # print("new")
 
         settings_check(pipe)  # check for settings updates
         dat = listenrecv(pipe)
@@ -181,6 +188,3 @@ def receiver(incoming, pipe):
 
             if incoming.full():
                 incoming.get()
-
-
-# print(payload)

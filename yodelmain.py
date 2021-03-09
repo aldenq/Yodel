@@ -16,38 +16,30 @@ from .dynamicheaders import *
 import yodel.standardformats as standardformats
 from .sender import send, sender, sendData, sender_pipe_output
 from .receiver import listen, receiver, receiver_pipe_output, incoming
+from typing import *
 
 import atexit
 
 
 @atexit.register
-def on_exit():  # was having issues getting built in daemon threads working, this is simple fix
-    #print("exiting 21")
+def on_exit() -> NoReturn:
+    """
+     was having issues getting built in daemon threads working, this is simple fix, also allows for more advanced exit behavior
+    """
     # give threads a moment to finish up what they are doing
-    time.sleep(globaldat.socketCloseTime)
+    time.sleep(globaldat.SOCKET_CLOSE_TIME)
     send_to_receiver(["exit", 0])
     send_to_sender(["exit", 0])
-# print(framedecode.__file__)
+
+
 # iface="wlp3s0"
 # nmcli device set wlp3s0 managed no
 # sudo ip link set wlp3s0 down
 # sudo iwconfig wlp3s0 mode Monitor
 # sudo ip link set wlp3s0 up
-# print(__name__=="yodel.yodelmain")
-
-
 # sudo iw dev wlp3s0 set channel 1 HT20
-
 # nmcli device set wlp3s0 managed no && sudo ip link set wlp3s0 down &&
 # sudo iwconfig wlp3s0 mode Monitor && sudo ip link set wlp3s0 up
-
-
-####
-# end of auto configurator
-####
-
-
-# print(payload,group,name)
 
 
 ####
@@ -55,37 +47,45 @@ def on_exit():  # was having issues getting built in daemon threads working, thi
 ####
 
 
-def setupThreads():
+def setupThreads() -> NoReturn:
+    """
+    setup sender and receiver threads
 
-    global sendert, receivert, outgoing, incoming
-    # print("startingt")
+    """
+    global sender_thread, receiver_thread, outgoing, incoming
 
-    sendert = mp.Process(
+    sender_thread = mp.Process(
         target=sender,
         args=(
             globaldat.outgoing,
             sender_pipe_output,
         ))
-    sendert.daemon = True
-    sendert.start()
-    # print("startingt2")
-    receivert = mp.Process(
+    sender_thread.daemon = True
+    sender_thread.start()
+
+    receiver_thread = mp.Process(
         target=receiver, args=(
             incoming, receiver_pipe_output,))
-    receivert.daemon = True
-    receivert.start()
-    #print("threads started")
+    receiver_thread.daemon = True
+    receiver_thread.start()
 
 
-def startRadio(interf):  # all functions needed to initiate radios
+def startRadio(interface: str) -> NoReturn:  # all functions needed to initiate radios
+    """
+    automatically setups wireless interface to work with yodel. also setups up sender and receiver threads.
 
-    autoConf(interf)
-    setInterface(interf)
+
+    @param interface: interface to be used with yodel
+    """
+    autoConf(interface)
+    setInterface(interface)
     setupThreads()
 
 
-def restartThreads():
-
+def restartThreads() -> NoReturn:
+    """
+    used to restart the sender and receiver threads if something breaks
+    """
     send_to_receiver(["exit", 0])
     send_to_sender(["exit", 0])
     globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
