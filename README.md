@@ -4,7 +4,7 @@ Yodel is a python library that uses WIFI hardware for remote control purposes. B
 
 
 ## Thanks to:
-    Phil0nator for helping with maintaining code readabiltiy
+    Phil0nator: for helping with maintaining code readabiltiy
 
 
 
