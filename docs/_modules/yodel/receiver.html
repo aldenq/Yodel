@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yodel.receiver &mdash; Yodel 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Yodel
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">yodel</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Yodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yodel.receiver</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yodel.receiver</h1><div class="highlight"><pre>
+<span></span><span class="c1"># this file deals with the setup and interaction with the receiver thread</span>
+<span class="c1"># interaction is done through a pipeline and a stack</span>
+<span class="c1"># the stack is used to store the bytes of messages sent to this robot</span>
+<span class="c1"># the pipline is used to give other instructions to the thread, things like settings updates</span>
+<span class="c1"># both the stack and pipeline are one way, the stack is used only for sending back data to the main thread, the pipeline is used only for sending instructions to the reciever thread</span>
+<span class="c1">#</span>
+
+
+<span class="kn">from</span> <span class="nn">.sender</span> <span class="kn">import</span> <span class="n">sendData</span>
+<span class="kn">import</span> <span class="nn">yodel.globaldat</span> <span class="k">as</span> <span class="nn">globaldat</span>
+<span class="kn">from</span> <span class="nn">.classes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">yodel.standardformats</span> <span class="k">as</span> <span class="nn">standardformats</span>
+<span class="kn">from</span> <span class="nn">.dynamicheaders</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">yodel.config</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="n">incoming</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Queue</span><span class="p">()</span>
+<span class="n">globaldat</span><span class="o">.</span><span class="n">receiver_pipe</span><span class="p">,</span> <span class="n">receiver_pipe_output</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pipe</span><span class="p">()</span>
+
+
+<span class="c1"># check to see if a given message is intended for this computer, either to</span>
+<span class="c1"># receive or to relay</span>
+<span class="k">def</span> <span class="nf">is_recipient</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">radiotap_header_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    check to see if a given message is intended for this computer and if the message should be relayed</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">    	 data: raw bytes for incoming message</span>
+
+<span class="sd">    	 radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># get data frame payload section</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">radiotap_header_length</span> <span class="o">+</span> <span class="mi">26</span> <span class="o">+</span> <span class="mi">5</span><span class="p">:]</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># pos is used as a pointer to the current section of the header being decoded</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">     message id, the semi unique identifer to each message to avoid receiving</span>
+<span class="sd">     them twice</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">message_ID</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">message_ID</span> <span class="o">==</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">lastMid</span><span class="p">:</span>  <span class="c1"># since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">message_ID</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">lastMessages</span><span class="p">:</span>  <span class="c1"># check if message has already been received</span>
+
+        <span class="n">globaldat</span><span class="o">.</span><span class="n">lastMid</span> <span class="o">=</span> <span class="n">message_ID</span>  <span class="c1"># set last mid to the current mid</span>
+        <span class="n">globaldat</span><span class="o">.</span><span class="n">lastMessages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message_ID</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">globaldat</span><span class="o">.</span><span class="n">lastMessages</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">64</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">lastMessages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">4</span>
+        <span class="n">namelen</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>  <span class="c1"># get length of name</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="n">namelen</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">nameM</span> <span class="o">=</span> <span class="p">(</span><span class="n">name</span> <span class="o">==</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">robotName</span> <span class="ow">or</span> <span class="n">namelen</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">pos</span> <span class="o">+=</span> <span class="n">namelen</span>
+        <span class="n">gnamelen</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">frame</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">group</span> <span class="o">=</span> <span class="n">frame</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="n">gnamelen</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">+=</span> <span class="n">gnamelen</span>
+
+        <span class="n">groupM</span> <span class="o">=</span> <span class="p">(</span><span class="n">group</span> <span class="ow">in</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span> <span class="ow">or</span> <span class="n">gnamelen</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">relay</span> <span class="o">=</span> <span class="p">(</span><span class="n">globaldat</span><span class="o">.</span><span class="n">relay</span> <span class="o">==</span> <span class="kc">True</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">name</span> <span class="o">==</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">robotName</span><span class="p">))</span>
+
+        <span class="k">return</span><span class="p">(</span><span class="n">nameM</span> <span class="ow">and</span> <span class="n">groupM</span><span class="p">,</span> <span class="n">relay</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">relayFrame</span><span class="p">(</span><span class="n">frame</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    used to allow receiver thread to relay messages back out</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	 frame: bytes of message being relayed</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">header</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x72\x6f\x62\x6f\x74</span><span class="s2">&quot;</span>  <span class="c1"># yodel identifier</span>
+    <span class="k">if</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">relay</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># check if relay is enabled</span>
+
+        <span class="c1"># format and pass data to sender thread</span>
+        <span class="n">sendData</span><span class="p">(</span><span class="n">header</span> <span class="o">+</span> <span class="n">frame</span><span class="p">,</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">maxRelay</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">listenrecv</span><span class="p">(</span><span class="n">pipe</span><span class="p">:</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pipe</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    listen for yodel messages, check if the are meant for this computer and if so receive them</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	 pipe: same pipe as in receiver, used to check for settings updates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">yodelSocket</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">globaldat</span><span class="o">.</span><span class="n">ETH_FRAME_LEN</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="n">radiolen</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">fcs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">17</span><span class="p">]</span>  <span class="c1"># fcs status flag is stored at byte 17</span>
+    <span class="k">if</span> <span class="n">fcs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># if fcs flag is set then remove the fcs which is the last 4 bytes</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+
+    <span class="n">payload</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">radiolen</span> <span class="o">+</span> <span class="mi">26</span><span class="p">:]</span>
+
+    <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">starth</span> <span class="o">=</span> <span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="n">pos</span><span class="p">:</span><span class="n">pos</span> <span class="o">+</span> <span class="mi">5</span><span class="p">])</span>
+
+    <span class="c1"># radio tap headers are stripped on external frames (non loopback)</span>
+    <span class="k">if</span> <span class="n">starth</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x72\x6f\x62\x6f\x74</span><span class="s2">&quot;</span><span class="p">:</span>
+        
+        <span class="c1"># additionally check for settings change if any yodel data is captured</span>
+        <span class="c1"># to see if anything important has changed</span>
+        <span class="n">settings_check</span><span class="p">(</span><span class="n">pipe</span><span class="p">)</span>
+        <span class="n">rdata</span> <span class="o">=</span> <span class="n">is_recipient</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">radiolen</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rdata</span><span class="p">:</span>
+            <span class="n">isr</span><span class="p">,</span> <span class="n">dorelay</span> <span class="o">=</span> <span class="n">rdata</span>
+            <span class="k">if</span> <span class="n">dorelay</span><span class="p">:</span>
+                <span class="n">relayFrame</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">isr</span><span class="p">:</span>
+
+                <span class="k">return</span><span class="p">(</span><span class="n">payload</span><span class="p">[</span><span class="mi">5</span><span class="p">:])</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">settings_check</span><span class="p">(</span><span class="n">pipe</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; reads from pipe to detect settings updates</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	 pipe: same settings pipe as used in receiver</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pipe</span><span class="o">.</span><span class="n">poll</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>  <span class="c1"># check for new data in pipe</span>
+        <span class="n">settings</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>  <span class="c1"># get data</span>
+        <span class="c1">#print(settings,&quot;setting update&quot;)</span>
+        <span class="n">setting_update</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">settings</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># change settings accordingly</span>
+
+
+<div class="viewcode-block" id="listen"><a class="viewcode-back" href="../../sr.html#yodel.listen">[docs]</a><span class="k">def</span> <span class="nf">listen</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Section</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    used to listen for data being sent to your robot, is non-blocking</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        yodel.Section: contains any received message which is accessible through the .payload attribute, also contain meta data about the message </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">incoming</span>
+    <span class="k">try</span><span class="p">:</span>  <span class="c1"># make specific error</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">incoming</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">frame</span>  <span class="c1"># take bytes from message</span>
+        <span class="c1"># take bytes and extract header info</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">decode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">standardformats</span><span class="o">.</span><span class="n">standard_header_format</span><span class="p">)</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+
+        <span class="k">return</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">receiver</span><span class="p">(</span><span class="n">incoming</span><span class="p">:</span> <span class="n">mp</span><span class="o">.</span><span class="n">Queue</span><span class="p">,</span> <span class="n">pipe</span><span class="p">:</span> <span class="n">mp</span><span class="o">.</span><span class="n">Pipe</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    this is the main function in the reciever thread. this checks for new messages and stores them into the stack so that main thread can access them</span>
+<span class="sd">    this also checks for settings updates and acts on them</span>
+
+
+<span class="sd">    Args:</span>
+<span class="sd">    	 incoming: queue that main thread reads from to receive new messages</span>
+
+<span class="sd">    	 pipe: settings updates</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">yodelSocket</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+
+        <span class="n">settings_check</span><span class="p">(</span><span class="n">pipe</span><span class="p">)</span>  <span class="c1"># check for settings updates</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">listenrecv</span><span class="p">(</span><span class="n">pipe</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">formatted</span> <span class="o">=</span> <span class="n">FrameRecv</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+
+            <span class="n">incoming</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">formatted</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">incoming</span><span class="o">.</span><span class="n">full</span><span class="p">():</span>
+                <span class="n">incoming</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Alden Quigley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

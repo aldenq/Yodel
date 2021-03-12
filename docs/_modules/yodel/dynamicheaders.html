@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yodel.dynamicheaders &mdash; Yodel 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Yodel
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">yodel</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Yodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yodel.dynamicheaders</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yodel.dynamicheaders</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">yodel.globaldat</span> <span class="k">as</span> <span class="nn">globaldat</span>
+
+
+<span class="k">def</span> <span class="nf">typeManagment</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Take in any type, and turn it into a bytearray</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">dtype</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="nb">bytearray</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">)))</span>
+    <span class="k">elif</span> <span class="n">dtype</span> <span class="o">==</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Flags"><a class="viewcode-back" href="../../datamang.html#yodel.Flags">[docs]</a><span class="k">class</span> <span class="nc">Flags</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Class meant to be used in fields, is an array of bools, used to store flags about the packet.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lookup_table: list of strings used to map keys to bits</span>
+
+
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lookup_table</span><span class="p">:</span><span class="nb">list</span><span class="p">):</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># lookup table, maps names provided by the field onto indexes in data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">lookup_table</span><span class="p">:</span>  <span class="c1"># check if lookup table is provided</span>
+            <span class="c1"># index lookup table, check to see if a name has been provided, if</span>
+            <span class="c1"># so create an entry in lookup dict with the key as the name and</span>
+            <span class="c1"># the value as the index</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lookup_table</span><span class="p">)):</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">lookup_table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="c1"># checks to see if the name provided for a given matrix is</span>
+                <span class="c1"># None, this is so that [&quot;a&quot;,None,&quot;b&quot;] will only set a key for</span>
+                <span class="c1"># index 0 and 2</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># create dict entry with key being a name provided and the</span>
+                    <span class="c1"># value being the index being mapped to</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup</span><span class="p">[</span><span class="n">key</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup</span><span class="p">[</span><span class="n">key</span><span class="p">]])</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__bytes__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="mi">7</span> <span class="o">-</span> <span class="n">i</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">val</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="n">i</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">))</span>
+        <span class="c1"># return(int(data,2))</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">8</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="n">val</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">out</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Format"><a class="viewcode-back" href="../../datamang.html#yodel.Format">[docs]</a><span class="k">class</span> <span class="nc">Format</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    formats are used to store the information needed to encode or decode data.</span>
+<span class="sd">    eg: first 3 bytes are a string, next 5 are for an int, etc.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	 fields: list of field objects that will define the format</span>
+<span class="sd">    </span>
+<span class="sd">    	 mtype: short for message type, allows unique identifiers to be given to your format that will be sent along with the format allowing for the receiver to know what format to use to decode the message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    
+    
+    
+    
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fields</span><span class="p">:</span><span class="n">List</span><span class="p">,</span> <span class="n">mtype</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">mtype</span>  <span class="c1"># kwargs.get(&quot;mtype&quot;, 0) #get message type</span>
+        <span class="n">supported_types</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">Flags</span><span class="p">]</span>
+        <span class="c1"># dictionary that holds field data formated as field name: field value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># fields holds the list of fields provided, still holds lots of useful</span>
+        <span class="c1"># meta data so it is kept around</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="n">fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># dict that holds field names and values, this is so that sections on init can just copy the info from here rather than regenerating it</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mtype</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># when a format is created and the message type is not zero store it in the array of message types so that autoDecode can use the format</span>
+            <span class="n">globaldat</span><span class="o">.</span><span class="n">messages_types</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mtype</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">fields</span><span class="p">)):</span>  <span class="c1"># copy data over and init output with field names</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields_dict</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
+
+        <span class="c1"># self.gen_data()</span>
+
+
+<div class="viewcode-block" id="Section"><a class="viewcode-back" href="../../datamang.html#yodel.Section">[docs]</a><span class="k">class</span> <span class="nc">Section</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    sections are used to store data and the meta-data needed to encode that data.</span>
+<span class="sd">    to get extract all of the data in a section use:</span>
+<span class="sd">    section.fields</span>
+
+<span class="sd">    sections can be encoded by using bytes(section), also,</span>
+<span class="sd">    if a section is used in yodel.send it will automatically handle it.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        format: format object to be used when encoding this section</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+
+
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span><span class="p">):</span>
+        <span class="c1"># store format so that it can be accessed later as necessary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">format</span>
+        <span class="c1"># copy empty dict from format which has names already set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;fields&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="nb">format</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+        <span class="c1"># holds anything that comes after all fields have been filled</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;payload&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+
+<div class="viewcode-block" id="Section.print"><a class="viewcode-back" href="../../datamang.html#yodel.Section.print">[docs]</a>    <span class="k">def</span> <span class="nf">print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># fancy print</span>
+
+        <span class="n">type_lookup</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="nb">bytearray</span><span class="p">:</span> <span class="s2">&quot;Bytearray&quot;</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">:</span> <span class="s2">&quot;Int&quot;</span><span class="p">,</span>
+            <span class="n">Flags</span><span class="p">:</span> <span class="s2">&quot;Flags&quot;</span><span class="p">,</span>
+            <span class="nb">bytes</span><span class="p">:</span> <span class="s2">&quot;bytes&quot;</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">:</span> <span class="s2">&quot;String&quot;</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">name_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">space</span> <span class="o">=</span> <span class="mi">20</span>
+
+            <span class="n">dat_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">space2</span> <span class="o">=</span> <span class="mi">20</span>
+            <span class="n">field_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fields_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type</span>
+
+            <span class="n">print_type</span> <span class="o">=</span> <span class="n">type_lookup</span><span class="p">[</span><span class="n">field_type</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">dat_len</span> <span class="o">&lt;</span> <span class="n">space2</span><span class="p">:</span>
+                <span class="n">space2</span> <span class="o">=</span> <span class="n">space2</span> <span class="o">-</span> <span class="n">dat_len</span>
+            <span class="k">if</span> <span class="n">name_len</span> <span class="o">&lt;</span> <span class="n">space</span><span class="p">:</span>
+                <span class="n">space</span> <span class="o">=</span> <span class="n">space</span> <span class="o">-</span> <span class="n">name_len</span>
+
+            <span class="k">if</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="c1"># print rules for strings</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">space</span><span class="si">}</span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="se">\&quot;</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="p">(</span><span class="n">space2</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span><span class="si">}{</span><span class="n">print_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="c1"># print rules for ints</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">space</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="p">(</span><span class="n">space2</span><span class="p">)</span><span class="si">}{</span><span class="n">print_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">field_type</span> <span class="o">==</span> <span class="n">Flags</span><span class="p">:</span>
+                <span class="c1"># print rules for flags</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">space</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="p">(</span><span class="n">space2</span><span class="p">)</span><span class="si">}{</span><span class="n">print_type</span><span class="si">}</span><span class="s2">     </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">lookup</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">bytearray</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">space</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="p">(</span><span class="n">space2</span><span class="p">)</span><span class="si">}{</span><span class="n">print_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;payload:</span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">*</span><span class="n">space</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">payload</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__bytes__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">evalBytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;fields&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;format&quot;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;payload&quot;</span><span class="p">]))</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;payload&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;payload&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;payload&quot;</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s2">&quot;payload&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../datamang.html#yodel.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    A field is a section of memory meant to hold one value</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: name of field</span>
+<span class="sd">        _type: data type to use in field</span>
+<span class="sd">        bytes: when applicable this can hold the length of the field</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">supported_types</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">Flags</span><span class="p">]</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">_type</span><span class="p">:</span> <span class="n">Type</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="nb">bytes</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="n">bytes_len</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">bytes</span>
+
+        <span class="k">if</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="nb">min</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span>
+            <span class="k">if</span> <span class="n">bytes_len</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">bytes_len</span>
+                <span class="c1"># signed integers are encoded using sign and magnitude</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">((</span><span class="n">bytes_len</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="p">((</span><span class="n">bytes_len</span> <span class="o">*</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># when type is an int len tells us the amount of bits needed to</span>
+                <span class="c1"># represent the possble options. when type is a str len tells</span>
+                <span class="c1"># us the amount of bits needed to store the length of the</span>
+                <span class="c1"># string</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="c1">#self.len  =4</span>
+        <span class="k">elif</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">str</span> <span class="ow">or</span> <span class="n">_type</span> <span class="o">==</span> <span class="nb">bytearray</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">bytes_len</span><span class="p">:</span>
+                <span class="nb">max</span> <span class="o">=</span> <span class="n">bytes_len</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="nb">min</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">((</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">_type</span> <span class="o">==</span> <span class="n">Flags</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">len</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># flags type is always one byte long</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># take the array that holds the bit names</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># field name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">_type</span>  <span class="c1"># field data type</span></div>
+        <span class="c1"># self.len = math.ceil((Max-Min).bit_length()/8) #when type is an in</span>
+        <span class="c1"># len tells us the amount of bits needed to represent the possble</span>
+        <span class="c1"># options. when type is a str len tells us the amount of bits needed to</span>
+        <span class="c1"># store the length of the string</span>
+
+
+<span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">,</span> <span class="n">encoding</span><span class="p">:</span> <span class="n">Format</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Section</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Returns list of all field names</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data: bytearray of data that you want to decode</span>
+
+<span class="sd">        encoding: format object to be used as the decoding rules</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">fnames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">encoding</span><span class="o">.</span><span class="n">fields_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">Section</span><span class="p">(</span><span class="n">encoding</span><span class="p">)</span>  <span class="c1"># generate new section object to store output</span>
+    <span class="n">cpos</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># current position, sort of a pointer to the bytearray</span>
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fnames</span><span class="p">)):</span>
+        <span class="n">fname</span> <span class="o">=</span> <span class="n">fnames</span><span class="p">[</span><span class="n">field</span><span class="p">]</span>  <span class="c1"># field name</span>
+        <span class="n">fieldobj</span> <span class="o">=</span> <span class="n">encoding</span><span class="o">.</span><span class="n">fields_dict</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span>
+        <span class="n">ftype</span> <span class="o">=</span> <span class="n">fieldobj</span><span class="o">.</span><span class="n">type</span>  <span class="c1"># data type of the field</span>
+        <span class="n">flen</span> <span class="o">=</span> <span class="n">fieldobj</span><span class="o">.</span><span class="n">len</span>  <span class="c1"># field length</span>
+        <span class="c1"># take the next n bytes where n is the length of the field</span>
+        <span class="n">fdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cpos</span><span class="p">:</span><span class="n">cpos</span> <span class="o">+</span> <span class="n">flen</span><span class="p">]</span>
+        <span class="n">cpos</span> <span class="o">+=</span> <span class="n">flen</span>  <span class="c1"># incriment the current position by the length of the field</span>
+        <span class="n">fmin</span> <span class="o">=</span> <span class="n">fieldobj</span><span class="o">.</span><span class="n">min</span>  <span class="c1"># min field value</span>
+
+        <span class="c1"># all data types need their own custom decoding scheme</span>
+
+        <span class="k">if</span> <span class="n">ftype</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="c1"># get the size of the string by taking the first flen bytes and</span>
+            <span class="c1"># converting them to an int</span>
+            <span class="n">strlen</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">fdata</span><span class="p">)</span>
+            <span class="n">strlen</span> <span class="o">+=</span> <span class="n">fmin</span>
+            <span class="c1"># return the next n bytes where n is the length of the string</span>
+            <span class="c1"># defined by strlen</span>
+            <span class="n">strdat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cpos</span><span class="p">:</span><span class="n">cpos</span> <span class="o">+</span> <span class="n">strlen</span><span class="p">]</span>
+            <span class="n">cpos</span> <span class="o">+=</span> <span class="n">strlen</span>  <span class="c1"># move current position forward by the length of the string</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">strdat</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>  <span class="c1"># decode bytes as utf-8</span>
+
+        <span class="k">elif</span> <span class="n">ftype</span> <span class="o">==</span> <span class="nb">bytearray</span><span class="p">:</span>
+            <span class="c1"># get the size of the bytearray by taking the first flen bytes and</span>
+            <span class="c1"># converting them to an int</span>
+            <span class="n">bytelen</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">fdata</span><span class="p">)</span>
+            <span class="n">bytelen</span> <span class="o">+=</span> <span class="n">fmin</span>
+            <span class="c1"># return the next n bytes where n is the length of the string</span>
+            <span class="c1"># defined by bytelen</span>
+            <span class="n">strdat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cpos</span><span class="p">:</span><span class="n">cpos</span> <span class="o">+</span> <span class="n">bytelen</span><span class="p">]</span>
+            <span class="n">cpos</span> <span class="o">+=</span> <span class="n">bytelen</span>  <span class="c1"># move current position by the length of the byte array</span>
+            <span class="c1"># move the raw bytes into the appropriate place in the class</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">strdat</span>
+
+        <span class="k">elif</span> <span class="n">ftype</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">fout</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">fdata</span><span class="p">)</span>
+            <span class="n">fout</span> <span class="o">+=</span> <span class="n">fmin</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">fout</span>
+
+        <span class="k">elif</span> <span class="n">ftype</span> <span class="o">==</span> <span class="n">Flags</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span> <span class="o">=</span> <span class="n">Flags</span><span class="p">([])</span>
+            <span class="c1"># because this is python the only way to turn a byte into a list of</span>
+            <span class="c1"># bits is to first convert it to an int, convert it to a utf-8</span>
+            <span class="c1"># encoded string of bits, and split that list, than convert all the</span>
+            <span class="c1"># terms into ints and return that as a list</span>
+            <span class="n">fout</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">bin</span><span class="p">(</span><span class="n">globaldat</span><span class="o">.</span><span class="n">getInt</span><span class="p">(</span><span class="n">fdata</span><span class="p">))[</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="n">fout</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">fout</span><span class="p">))</span>
+            <span class="c1"># add appropriate 0 padding depedning on the length</span>
+            <span class="n">fout</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">8</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">fout</span><span class="p">))</span> <span class="o">+</span> <span class="n">fout</span>
+
+            <span class="n">output</span><span class="p">[</span><span class="n">fname</span><span class="p">]</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">fout</span>
+
+    <span class="n">output</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">cpos</span><span class="p">:]</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">evalBytes</span><span class="p">(</span><span class="n">field_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span><span class="p">,</span>
+              <span class="n">payload</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytearray</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Used in the __bytes__ method in the section class. Is used to return the</span>
+<span class="sd">    bytes based on the field dict.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        field_dict: a dictionary where the keys are field names, and the</span>
+<span class="sd">        values are the values of those fields</span>
+
+<span class="sd">        format: format object to be used when encoding data</span>
+
+<span class="sd">        payload: any data that should be added on after the section has been formatted</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>  <span class="c1"># output is bytearray</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">format</span><span class="o">.</span><span class="n">fields_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">field_data</span> <span class="o">=</span> <span class="n">field_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="n">format_field</span> <span class="o">=</span> <span class="nb">format</span><span class="o">.</span><span class="n">fields_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>  <span class="c1"># take the field from the format</span>
+        <span class="n">field_type</span> <span class="o">=</span> <span class="n">format_field</span><span class="o">.</span><span class="n">type</span>  <span class="c1"># get the expected data type of the field</span>
+        <span class="c1">#fmax = format_field.max</span>
+        <span class="c1"># min length(when refering to bytearray or string)/ value(when refering</span>
+        <span class="c1"># to an int)</span>
+        <span class="n">fmin</span> <span class="o">=</span> <span class="n">format_field</span><span class="o">.</span><span class="n">min</span>
+        <span class="n">flen</span> <span class="o">=</span> <span class="n">format_field</span><span class="o">.</span><span class="n">len</span>  <span class="c1"># length in bytes of field</span>
+
+        <span class="k">if</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span>
+                <span class="n">field_data</span><span class="p">):</span>  <span class="c1"># check if the expected data type matches the actual type</span>
+
+            <span class="k">if</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+                <span class="c1"># the amount of bytes for the int is included in the standard</span>
+                <span class="c1"># so it does not need to be added to the output</span>
+                <span class="n">field_data</span> <span class="o">-=</span> <span class="n">format_field</span><span class="o">.</span><span class="n">min</span>
+
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">field_data</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">flen</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">field_type</span> <span class="o">==</span> <span class="n">Flags</span><span class="p">:</span>  <span class="c1"># flags are always 1 byte</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">field_data</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="n">field_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">field_data</span><span class="p">)</span>
+                <span class="n">field_len</span> <span class="o">-=</span> <span class="n">fmin</span>  <span class="c1"># minimum length is subtracted because the reciever will add the min back before reading the bytes</span>
+
+                <span class="c1"># for string the length of the string first needs to be added</span>
+                <span class="c1"># as an int before the string data</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">field_len</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">flen</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+
+                <span class="c1"># strings are encoded as a utf-8 string</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">field_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">,</span>
+                                                   <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">))</span>
+
+            <span class="k">elif</span> <span class="n">field_type</span> <span class="o">==</span> <span class="nb">bytearray</span><span class="p">:</span>
+                <span class="n">field_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">field_data</span><span class="p">)</span>
+                <span class="n">field_len</span> <span class="o">-=</span> <span class="n">fmin</span>
+                <span class="c1"># like strings, with byte arrays the length is added prior to</span>
+                <span class="c1"># the data</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">field_len</span><span class="o">.</span><span class="n">to_bytes</span><span class="p">(</span><span class="n">flen</span><span class="p">,</span> <span class="s1">&#39;little&#39;</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="n">field_data</span>
+
+            <span class="k">pass</span>
+    <span class="n">out</span> <span class="o">+=</span> <span class="n">payload</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">autoDecode</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Section</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Section</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">]:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    automatically decodes the payload section of a given section, for this to work the format must be defined earlier on. </span>
+
+<span class="sd">    Args: </span>
+<span class="sd">    	data: Section a section to decode automatically</span>
+<span class="sd">    @returns either a Section containing the formatted values of &#39;data&#39;, or data&#39;s payload</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">mtype</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">mtype</span>
+    <span class="k">if</span> <span class="n">mtype</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">byte_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">payload</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">decode</span><span class="p">(</span><span class="n">byte_data</span><span class="p">,</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">messages_types</span><span class="p">[</span><span class="n">mtype</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">payload</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Alden Quigley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

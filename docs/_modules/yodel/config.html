@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>yodel.config &mdash; Yodel 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Yodel
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">yodel</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Yodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>yodel.config</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for yodel.config</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">yodel.globaldat</span> <span class="k">as</span> <span class="nn">globaldat</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">def</span> <span class="nf">setting_update</span><span class="p">(</span><span class="n">setting</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    modifies settings based on the contents of pipe</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	setting: setting that is to be modified</span>
+
+<span class="sd">    	value: what that setting should be set to</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">setting</span> <span class="o">==</span> <span class="s2">&quot;name&quot;</span><span class="p">:</span>  <span class="c1"># change name</span>
+        <span class="n">globaldat</span><span class="o">.</span><span class="n">robotName</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">elif</span> <span class="n">setting</span> <span class="o">==</span> <span class="s2">&quot;add_group&quot;</span><span class="p">:</span>  <span class="c1"># add to new group</span>
+        <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">setting</span> <span class="o">==</span> <span class="s2">&quot;del_group&quot;</span><span class="p">:</span>  <span class="c1"># delete group</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+            <span class="n">loc</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">setting</span> <span class="o">==</span> <span class="s2">&quot;clr_group&quot;</span><span class="p">:</span>  <span class="c1"># clear groups</span>
+        <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">elif</span> <span class="n">setting</span> <span class="o">==</span> <span class="s2">&quot;exit&quot;</span><span class="p">:</span>  <span class="c1"># exit</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;exit sender&quot;</span><span class="p">)</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">send_to_receiver</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;some settings changes require data to be sent to a thread this function</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	data: list that holds a setting and what value it should be changed to, eg: [&quot;name&quot;,&quot;tester&quot;]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">receiver_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">send_to_sender</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    some settings changes require data to be sent to sender thread this function takes care of that</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	data: list that holds a setting and what value it should be changed to, eg: [&quot;name&quot;,&quot;tester&quot;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">sender_pipe</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="setRepeats"><a class="viewcode-back" href="../../genconf.html#yodel.setRepeats">[docs]</a><span class="k">def</span> <span class="nf">setRepeats</span><span class="p">(</span><span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; control amount of times a message is repeated during a send</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	num: number of time messages should be repeated, larger value means better reliability with reduce bandwidth</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">totalsends</span> <span class="o">=</span> <span class="n">num</span></div>
+
+
+<div class="viewcode-block" id="enableRelay"><a class="viewcode-back" href="../../genconf.html#yodel.enableRelay">[docs]</a><span class="k">def</span> <span class="nf">enableRelay</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; enable relaying of messages to allow extended range for other robots</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	state: True:relay on, False: relay off</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">relay</span> <span class="o">=</span> <span class="n">state</span></div>
+
+
+<span class="k">def</span> <span class="nf">initPolyNodelYodel</span><span class="p">():</span>
+    <span class="n">enableRelay</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="setName"><a class="viewcode-back" href="../../genconf.html#yodel.setName">[docs]</a><span class="k">def</span> <span class="nf">setName</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    set or change the name of your robot</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	name: name of robot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">robotName</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">send_to_receiver</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span>  <span class="c1"># send name change to other threads</span>
+    <span class="n">send_to_sender</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="getName"><a class="viewcode-back" href="../../genconf.html#yodel.getName">[docs]</a><span class="k">def</span> <span class="nf">getName</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    returns the name of your robot</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: name of robot</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">globaldat</span><span class="o">.</span><span class="n">robotName</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="joinGroup"><a class="viewcode-back" href="../../genconf.html#yodel.joinGroup">[docs]</a><span class="k">def</span> <span class="nf">joinGroup</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    add robot to a new group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	group: name of group to add robot to</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+    <span class="n">send_to_receiver</span><span class="p">([</span><span class="s2">&quot;add_group&quot;</span><span class="p">,</span> <span class="n">group</span><span class="p">])</span>
+    <span class="n">send_to_sender</span><span class="p">([</span><span class="s2">&quot;add_group&quot;</span><span class="p">,</span> <span class="n">group</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="leaveGroup"><a class="viewcode-back" href="../../genconf.html#yodel.leaveGroup">[docs]</a><span class="k">def</span> <span class="nf">leaveGroup</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    remove robot from specifed group</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	group: name of group you want to leave</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="p">:</span>
+        <span class="n">loc</span> <span class="o">=</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span>
+    <span class="n">send_to_receiver</span><span class="p">([</span><span class="s2">&quot;del_group&quot;</span><span class="p">,</span> <span class="n">group</span><span class="p">])</span>
+    <span class="n">send_to_sender</span><span class="p">([</span><span class="s2">&quot;del_group&quot;</span><span class="p">,</span> <span class="n">group</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="getGroups"><a class="viewcode-back" href="../../genconf.html#yodel.getGroups">[docs]</a><span class="k">def</span> <span class="nf">getGroups</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get list of groups robot is a member of</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: list of group names which this robot is a member of</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="clearGroups"><a class="viewcode-back" href="../../genconf.html#yodel.clearGroups">[docs]</a><span class="k">def</span> <span class="nf">clearGroups</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    remove robot from all groups</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">send_to_receiver</span><span class="p">([</span><span class="s2">&quot;clr_group&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span>
+    <span class="n">send_to_sender</span><span class="p">([</span><span class="s2">&quot;clr_group&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">])</span></div>
+
+
+<span class="k">def</span> <span class="nf">setInterface</span><span class="p">(</span><span class="n">interface</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    set the interface used by the robot and initates the socket.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	interface: name of wifi interface that will be used</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">iface</span> <span class="o">=</span> <span class="n">interface</span>
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">yodelSocket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">AF_PACKET</span><span class="p">,</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_RAW</span><span class="p">,</span>
+        <span class="n">socket</span><span class="o">.</span><span class="n">htons</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">globaldat</span><span class="o">.</span><span class="n">yodelSocket</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="n">interface</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="setChannel"><a class="viewcode-back" href="../../genconf.html#yodel.setChannel">[docs]</a><span class="k">def</span> <span class="nf">setChannel</span><span class="p">(</span><span class="n">channel</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    set the channel for the interface, </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	channel: channel number to switch to</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#some drivers only work with iw, some only work with iwconfig so both are included</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo iw dev </span><span class="si">{</span><span class="n">globaldat</span><span class="o">.</span><span class="n">iface</span><span class="si">}</span><span class="s2"> set channel </span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo iwconfig </span><span class="si">{</span><span class="n">globaldat</span><span class="o">.</span><span class="n">iface</span><span class="si">}</span><span class="s2"> channel </span><span class="si">{</span><span class="n">channel</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="setPower"><a class="viewcode-back" href="../../genconf.html#yodel.setPower">[docs]</a><span class="k">def</span> <span class="nf">setPower</span><span class="p">(</span><span class="n">txdBm</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    set the transmit power of wifi interface</span>
+<span class="sd">    3500 is not necessarily a legal or safe power level for your hardware,</span>
+<span class="sd">    the limiter is just to marginally decrease the odds of causing problems.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	txdBm: transmit power in dBm</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">txdBm</span> <span class="o">&gt;</span> <span class="mi">3500</span><span class="p">:</span>
+        <span class="n">txdBm</span> <span class="o">=</span> <span class="mi">3500</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;power level is set too high&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo iw dev </span><span class="si">{</span><span class="n">globaldat</span><span class="o">.</span><span class="n">iface</span><span class="si">}</span><span class="s2"> set txpower fixed </span><span class="si">{</span><span class="n">txdBm</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1">####</span>
+<span class="c1"># end of settings managment</span>
+<span class="c1">####</span>
+
+
+<span class="c1">####</span>
+<span class="c1"># auto configurator</span>
+<span class="c1">####</span>
+
+<span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    run a command, get the output</span>
+<span class="sd">    basic time saver, not generally applicable to all linux cmds</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	cmd: command being ran</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cmda</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">cmda</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmda</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">enableMonitor</span><span class="p">(</span><span class="n">interface</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; auto configure monitor mode on interface</span>
+<span class="sd">        it&#39;s ok for this to raise errors</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	interface: wifi interface being used</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo rfkill unblock wifi; sudo rfkill unblock all&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nmcli device set </span><span class="si">{</span><span class="n">interface</span><span class="si">}</span><span class="s2"> managed no&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo ip link set </span><span class="si">{</span><span class="n">interface</span><span class="si">}</span><span class="s2"> down&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo iwconfig </span><span class="si">{</span><span class="n">interface</span><span class="si">}</span><span class="s2"> mode Monitor&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;sudo ip link set </span><span class="si">{</span><span class="n">interface</span><span class="si">}</span><span class="s2"> up&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">isMonitor</span><span class="p">(</span><span class="n">interface</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    get if interface is in monitor mode, is lazy but only has to run a couple times and only during setup</span>
+<span class="sd">    (re-work with ioctl)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        interface: interface being used</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="p">(</span><span class="n">command</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;iwconfig </span><span class="si">{</span><span class="n">interface</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Mode:Monitor&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">autoConf</span><span class="p">(</span><span class="n">interface</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NoReturn</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    auto configure wifi interface</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">    	interface: name of wifi interface being used</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">isMonitor</span><span class="p">(</span><span class="n">interface</span><span class="p">):</span>  <span class="c1"># first try to set it to monitor mode</span>
+        <span class="n">enableMonitor</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">isMonitor</span><span class="p">(</span><span class="n">interface</span><span class="p">):</span>  <span class="c1"># if set fails let the user know</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;monitor mode is not available, please select a different interface or try a new driver&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Alden Quigley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

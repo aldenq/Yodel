@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>yodel.globaldat &#8212; Yodel 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for yodel.globaldat</h1><div class="highlight"><pre>
+<span></span>
+
+
+<span class="n">lastMessages</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># iface = &quot;wlx000f600a2d3e&quot;</span>
+<span class="n">iface</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># interface name, set during runtime</span>
+<span class="n">robotName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># robot name, set by setName during runtime</span>
+<span class="n">groups</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>  <span class="c1"># list of groups bot is a part of</span>
+
+<span class="n">ETH_P_ALL</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">ETH_FRAME_LEN</span> <span class="o">=</span> <span class="mi">1514</span>  <span class="c1"># Max. octets in frame sans FCS</span>
+<span class="n">relay</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">maxRelay</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">totalsends</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">radiotap</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00\x00\x22\x00\xae\x40\x00\xa0\x20\x08\x00\xa0\x20\x08\x00\x00\x00\x10\x10\x02\x6c\x09\xa0\x00\xb0\x00\x64\x00\x00\x00\x00\x00\x00\x01</span><span class="s2">&quot;</span>
+<span class="n">lastMid</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># message ID of last message recieved</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;starting&quot;</span><span class="p">)</span>
+<span class="n">s</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">sendert</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">receivert</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="getInt"><a class="viewcode-back" href="../../yodel.html#yodel.globaldat.getInt">[docs]</a><span class="k">def</span> <span class="nf">getInt</span><span class="p">(</span><span class="n">bytea</span><span class="p">):</span>
+    <span class="c1">#print(bytea,&quot;byteea&quot;)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">int</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">bytea</span><span class="p">,</span> <span class="n">byteorder</span><span class="o">=</span><span class="s1">&#39;little&#39;</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="bytesPrint"><a class="viewcode-back" href="../../yodel.html#yodel.globaldat.bytesPrint">[docs]</a><span class="k">def</span> <span class="nf">bytesPrint</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\x&#39;</span> <span class="o">+</span> <span class="nb">hex</span><span class="p">(</span><span class="n">letter</span><span class="p">)[</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">letter</span> <span class="ow">in</span> <span class="n">x</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../modules.html">Yodel</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../yodel.html">yodel package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../modules.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Alden Quigley.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,9 @@
+Data Management
+=============
+
+.. automodule:: yodel
+   :members: Field,Section,Format,Flags
+   :undoc-members:
+  
+
+

@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>General configuration &mdash; Yodel 0.0.9 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Management" href="datamang.html" />
+    <link rel="prev" title="Sending and Receiving" href="sr.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Yodel
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">yodel</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="sr.html">Sending and Receiving</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">General configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="datamang.html">Data Management</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Yodel</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">yodel</a> &raquo;</li>
+        
+      <li>General configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/genconf.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="general-configuration">
+<h1>General configuration<a class="headerlink" href="#general-configuration" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-yodel"></span><dl class="py function">
+<dt id="yodel.clearGroups">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">clearGroups</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#clearGroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.clearGroups" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove robot from all groups</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.enableRelay">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">enableRelay</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><span class="pre">bool</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#enableRelay"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.enableRelay" title="Permalink to this definition">¶</a></dt>
+<dd><p>enable relaying of messages to allow extended range for other robots</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>state</strong> – True:relay on, False: relay off</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.getGroups">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">getGroups</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><span class="pre">list</span></a><a class="reference internal" href="_modules/yodel/config.html#getGroups"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.getGroups" title="Permalink to this definition">¶</a></dt>
+<dd><p>get list of groups robot is a member of</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>list of group names which this robot is a member of</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.getName">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">getName</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a><a class="reference internal" href="_modules/yodel/config.html#getName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.getName" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the name of your robot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>name of robot</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.joinGroup">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">joinGroup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#joinGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.joinGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>add robot to a new group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>group</strong> – name of group to add robot to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.leaveGroup">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">leaveGroup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#leaveGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.leaveGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>remove robot from specifed group</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>group</strong> – name of group you want to leave</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.setChannel">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">setChannel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#setChannel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.setChannel" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the channel for the interface,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>channel</strong> – channel number to switch to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.setName">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">setName</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#setName"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.setName" title="Permalink to this definition">¶</a></dt>
+<dd><p>set or change the name of your robot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>name</strong> – name of robot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.setPower">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">setPower</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">txdBm</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#setPower"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.setPower" title="Permalink to this definition">¶</a></dt>
+<dd><p>set the transmit power of wifi interface
+3500 is not necessarily a legal or safe power level for your hardware,
+the limiter is just to marginally decrease the odds of causing problems.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>txdBm</strong> – transmit power in dBm</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.setRepeats">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">setRepeats</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/config.html#setRepeats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.setRepeats" title="Permalink to this definition">¶</a></dt>
+<dd><p>control amount of times a message is repeated during a send</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>num</strong> – number of time messages should be repeated, larger value means better reliability with reduce bandwidth</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="yodel.startRadio">
+<code class="sig-prename descclassname"><span class="pre">yodel.</span></code><code class="sig-name descname"><span class="pre">startRadio</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">NoReturn</span><a class="reference internal" href="_modules/yodel/yodelmain.html#startRadio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yodel.startRadio" title="Permalink to this definition">¶</a></dt>
+<dd><p>automatically setups wireless interface to work with yodel. also setups up sender and receiver threads.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>interface</strong> – interface to be used with yodel</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="datamang.html" class="btn btn-neutral float-right" title="Data Management" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="sr.html" class="btn btn-neutral float-left" title="Sending and Receiving" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Alden Quigley.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

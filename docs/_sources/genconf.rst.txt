@@ -1,0 +1,8 @@
+General configuration
+====================
+
+
+
+.. automodule:: yodel
+   :members: setRepeats,enableRelay,setName,getName,joinGroup,leaveGroup,getGroups,clearGroups,startRadio,setChannel,setPower
+   :undoc-members:
