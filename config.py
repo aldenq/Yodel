@@ -72,7 +72,7 @@ def toggleRelay(state: bool) -> NoReturn:
 
 
 def initPolyNodelYodel():
-    enableRelay(True)
+    toggleRelay(True)
 
 
 def setName(name) -> NoReturn:
