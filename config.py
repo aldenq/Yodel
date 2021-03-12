@@ -62,7 +62,7 @@ def setRepeats(num: int) -> NoReturn:
     globaldat.totalsends = num
 
 
-def enableRelay(state: bool) -> NoReturn:
+def toggleRelay(state: bool) -> NoReturn:
     """ enable relaying of messages to allow extended range for other robots
 
     @params state: True:relay on, False: relay off
