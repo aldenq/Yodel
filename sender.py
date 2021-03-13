@@ -32,11 +32,12 @@ exist_start = 0
 
 def sendData(packet: FrameStruct, repeats: int) -> NoReturn:
     """
-     Generate 80211 header and send completed data
+    Generate 80211 header and send completed data
 
-     @param packet: framestruct that holds raw outgoing data as well and info about how it should be sent
+    Args:
+     	packet: framestruct that holds raw outgoing data as well and info about how it should be sent
 
-     @param repeats: number of times message should be sent
+     	repeats: number of times message should be sent
     """
     ftype = b'\x08\x00'
     dur = b'\x00\x00'
@@ -58,19 +59,19 @@ def sendData(packet: FrameStruct, repeats: int) -> NoReturn:
         packet  # attach radiotap headers, 80211 headers and yodel payload
 
     for i in range(repeats):  # re-transmmit message a couple times
-        globaldat.s.send(data)  # send the data
+        globaldat.yodelSocket.send(data)  # send the data
 
 
 def send(payload: any, name: str = "", group: str = "") -> NoReturn:
     """
     take in payload and generate additional data needed to be complient with yodel standard header and add it to the stack for the thread to access.
 
+    Args:
+        payload: data being sent
 
-    @payload: data being sent
+        name: name of recipient
 
-    @name: name of recipient
-
-    @group: group of recipient
+        group: group of recipient
     """
 
     global outgoing, outgoing_data
@@ -114,10 +115,11 @@ def send(payload: any, name: str = "", group: str = "") -> NoReturn:
 def sender(outgoing: mp.Queue, pipe: mp.Pipe) -> NoReturn:  # thread that manages sending out data
     """
     create thread to manage sending data from outgoing stack
+    
+    Args:
+    	 outgoing: queue that holds all messages being sent
 
-    @param outgoing: queue that holds all messages being sent
-
-    @param pipe: used to send settings updates and other status updates from main to this thread
+    	 pipe: used to send settings updates and other status updates from main to this thread
 
     """
     while True:

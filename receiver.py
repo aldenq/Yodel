@@ -29,10 +29,10 @@ def is_recipient(
     check to see if a given message is intended for this computer and if the message should be relayed
 
 
+    Args:
+    	 data: raw bytes for incoming message
 
-    @param data: raw bytes for incoming message
-
-    @param radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.
+    	 radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.
     """
 
     # get data frame payload section
@@ -80,8 +80,8 @@ def relayFrame(frame: bytearray) -> NoReturn:
     """
     used to allow receiver thread to relay messages back out
 
-
-    @params frame: bytes of message being relayed
+    Args:
+    	 frame: bytes of message being relayed
 
     """
 
@@ -96,13 +96,13 @@ def listenrecv(pipe: mp.Pipe) -> bytearray:
     """
     listen for yodel messages, check if the are meant for this computer and if so receive them
 
-
-    @params pipe: same pipe as in receiver, used to check for settings updates
+    Args:
+    	 pipe: same pipe as in receiver, used to check for settings updates
     """
 
     try:
 
-        data = globaldat.s.recv(globaldat.ETH_FRAME_LEN)
+        data = globaldat.yodelSocket.recv(globaldat.ETH_FRAME_LEN)
 
     except BaseException:
         return (None)
@@ -120,7 +120,7 @@ def listenrecv(pipe: mp.Pipe) -> bytearray:
 
     # radio tap headers are stripped on external frames (non loopback)
     if starth == b"\x72\x6f\x62\x6f\x74":
-        # print("check")
+        
         # additionally check for settings change if any yodel data is captured
         # to see if anything important has changed
         settings_check(pipe)
@@ -140,7 +140,8 @@ def listenrecv(pipe: mp.Pipe) -> bytearray:
 def settings_check(pipe) -> NoReturn:
     """ reads from pipe to detect settings updates
 
-    @params pipe: same settings pipe as used in receiver
+    Args:
+    	 pipe: same settings pipe as used in receiver
     """
     if pipe.poll(0):  # check for new data in pipe
         settings = pipe.recv()  # get data
@@ -151,6 +152,9 @@ def settings_check(pipe) -> NoReturn:
 def listen() -> Section:
     """
     used to listen for data being sent to your robot, is non-blocking
+
+    Returns:
+        yodel.Section: contains any received message which is accessible through the .payload attribute, also contain meta data about the message 
     """
     global incoming
     try:  # make specific error
@@ -170,12 +174,12 @@ def receiver(incoming: mp.Queue, pipe: mp.Pipe) -> NoReturn:
     this also checks for settings updates and acts on them
 
 
+    Args:
+    	 incoming: queue that main thread reads from to receive new messages
 
-    @params incoming: queue that main thread reads from to receive new messages
-
-    @params pipe: settings updates
+    	 pipe: settings updates
     """
-    globaldat.s.settimeout(.1)
+    globaldat.yodelSocket.settimeout(.1)
     while True:
 
         settings_check(pipe)  # check for settings updates

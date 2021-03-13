@@ -4,8 +4,7 @@ from multiprocessing.queues import Queue
 from socket import socket
 from typing import *
 
-lastMessages: List[int] = []
-# iface = "wlx000f600a2d3e"
+lastMessages: List[int] = [] #holds the list of past message id's received, used to avoid receiving the same message twice
 iface: str = ""  # interface name, set during runtime
 robotName: str = ""  # robot name, set by setName during runtime
 groups: List[str] = [""]  # list of groups bot is a part of
@@ -16,9 +15,9 @@ relay: bool = False
 maxRelay: int = 5
 totalsends: int = 10
 RADIO_TAP: bytearray = b"\x00\x00\x22\x00\xae\x40\x00\xa0\x20\x08\x00\xa0\x20\x08\x00\x00\x00\x10\x10\x02\x6c\x09\xa0\x00\xb0\x00\x64\x00\x00\x00\x00\x00\x00\x01"
-lastMid: int = 0  # message ID of last message recieved
+lastMid: int = 0  # message ID of last message received
 
-s: socket = None
+yodelSocket: socket = None
 debug: bool = True
 sender_thread: multiprocessing.Process = None
 receiver_thread: multiprocessing.Process = None

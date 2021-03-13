@@ -1,3 +1,12 @@
+"""
+this file defines some of the formats used internally for wrapping various types of messages the user might send
+
+
+
+"""
+
+
+
 from yodel.dynamicheaders import *
 
 

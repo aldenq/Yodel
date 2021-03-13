@@ -19,11 +19,17 @@ def typeManagment(data: Any) -> bytearray:
 class Flags:
     '''
     Class meant to be used in fields, is an array of bools, used to store flags about the packet.
+
+    Args:
+        lookup_table: list of strings used to map keys to bits
+
+
+    
     '''
-    length = 1
+    
 
-    def __init__(self, lookup_table):
-
+    def __init__(self, lookup_table:list):
+        length = 1
         self.data = [0, 0, 0, 0, 0, 0, 0, 0]
         self.lookup = {}  # lookup table, maps names provided by the field onto indexes in data
         self.a = 2
@@ -74,13 +80,21 @@ class Format:
     formats are used to store the information needed to encode or decode data.
     eg: first 3 bytes are a string, next 5 are for an int, etc.
 
+    Args:
+    	 fields: list of field objects that will define the format
+    
+    	 mtype: short for message type, allows unique identifiers to be given to your format that will be sent along with the format allowing for the receiver to know what format to use to decode the message
     """
 
-    supported_types = [int, str, bytearray, Flags]
 
-    def __init__(self, fields, mtype: int = 0):
+    
+    
+    
+    
+
+    def __init__(self, fields:List, mtype: int = 0):
         self.mtype: int = mtype  # kwargs.get("mtype", 0) #get message type
-
+        supported_types = [int, str, bytearray, Flags]
         # dictionary that holds field data formated as field name: field value
         self.fields_dict = {}
         # fields holds the list of fields provided, still holds lots of useful
@@ -108,7 +122,15 @@ class Section:
 
     sections can be encoded by using bytes(section), also,
     if a section is used in yodel.send it will automatically handle it.
+
+    Args:
+        format: format object to be used when encoding this section
     """
+
+
+
+
+
 
     def __init__(self, format: Format):
         # store format so that it can be accessed later as necessary
@@ -187,8 +209,13 @@ class Section:
 class Field:
     '''
     A field is a section of memory meant to hold one value
-    '''
 
+    Args:
+        name: name of field
+        _type: data type to use in field
+        bytes: when applicable this can hold the length of the field
+    '''
+    supported_types = [int, str, bytearray, Flags]
     def __init__(self, name: str, _type: Type, *args, bytes=0, min=0, max=0):
         bytes_len: int = bytes
 
@@ -237,6 +264,11 @@ class Field:
 def decode(data: bytearray, encoding: Format) -> Section:
     '''
     Returns list of all field names
+
+    Args:
+        data: bytearray of data that you want to decode
+
+        encoding: format object to be used as the decoding rules
     '''
     fnames = list(encoding.fields_dict.keys())
     output = Section(encoding)  # generate new section object to store output
@@ -303,8 +335,15 @@ def evalBytes(field_dict: dict, format: Format,
     '''
     Used in the __bytes__ method in the section class. Is used to return the
     bytes based on the field dict.
-    field_dict is a dictionary where the keys are field names, and the
-    values are the values of those fields
+
+    Args:
+        field_dict: a dictionary where the keys are field names, and the
+        values are the values of those fields
+
+        format: format object to be used when encoding data
+
+        payload: any data that should be added on after the section has been formatted
+
     '''
 
     out = b''  # output is bytearray
@@ -359,7 +398,10 @@ def evalBytes(field_dict: dict, format: Format,
 
 def autoDecode(data: Section) -> Union[Section, bytearray]:
     '''
-    @param data: Section a section to decode automatically
+    automatically decodes the payload section of a given section, for this to work the format must be defined earlier on. 
+
+    Args: 
+    	data: Section a section to decode automatically
     @returns either a Section containing the formatted values of 'data', or data's payload
     '''
     mtype = data.mtype
