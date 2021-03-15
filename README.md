@@ -1,5 +1,5 @@
 # Yodel
-Yodel is a Python library that uses WIFI hardware for remote control purposes. Given it does not rely on wifi hotspots it has a far greater range than simple wifi based remote control solutions at the cost of bandwidth. Yodel is its own protocol that sits under 80211. Yodel was designed specifically with Raspberry PI robotics in mind however it should work with any Linux computer with an appropriate wifi interface.
+Yodel is a Python library that uses WIFI hardware for remote control purposes. Given it does not rely on wifi hotspots it has a far greater range than simple wifi based remote control solutions at the cost of bandwidth. Yodel is its own protocol that sits under 80211. Yodel was designed specifically with Raspberry PI robotics in mind, however, it should work with any Linux computer with an appropriate wifi interface.
 
 ## [Documentation](https://aldenq.github.io/YodelDocs/modules.html)
 ### Thanks
