@@ -57,7 +57,8 @@ def sendData(packet: FrameStruct, repeats: int) -> NoReturn:
     # combine header with other data to create valid frame
     data = globaldat.RADIO_TAP + header80211 + b"\x72\x6f\x62\x6f\x74" + \
         packet  # attach radiotap headers, 80211 headers and yodel payload
-
+    #globaldat.bytesPrint(data)
+    #print(repeats)
     for i in range(repeats):  # re-transmmit message a couple times
         globaldat.yodelSocket.send(data)  # send the data
 

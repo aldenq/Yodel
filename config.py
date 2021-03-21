@@ -27,6 +27,9 @@ def setting_update(setting, value):
             del globaldat.groups[loc]
     elif setting == "clr_group":  # clear groups
         globaldat.groups = []
+    elif setting == "setr":  # enable or disable relaying
+        print("aaa")
+        globaldat.relay = int(value)
     elif setting == "exit":  # exit
         print("exit sender")
 
@@ -67,18 +70,19 @@ def setRepeats(num: int) -> NoReturn:
     globaldat.totalsends = num
 
 
-def enableRelay(state: bool) -> NoReturn:
+def toggleRelay(state: bool) -> NoReturn:
     """ enable relaying of messages to allow extended range for other robots
 
     Args:
     	state: True:relay on, False: relay off
     """
-
+    send_to_receiver(["setr", state])  # send name change to other threads
+    send_to_sender(["setr", state])
     globaldat.relay = state
 
 
 def initPolyNodelYodel():
-    enableRelay(True)
+    toggleRelay(True)
 
 
 def setName(name) -> NoReturn:
@@ -164,7 +168,10 @@ def setInterface(interface: str) -> NoReturn:
         socket.AF_PACKET,
         socket.SOCK_RAW,
         socket.htons(3))
+
     globaldat.yodelSocket.bind((interface, 0))
+
+   
 
 
 def setChannel(channel:int) -> NoReturn:
@@ -226,7 +233,10 @@ def enableMonitor(interface:str) -> NoReturn:
     	interface: wifi interface being used
     """
     os.system(f"sudo rfkill unblock wifi; sudo rfkill unblock all")
-    os.system(f"nmcli device set {interface} managed no")
+    try:
+        os.system(f"nmcli device set {interface} managed no")
+    except:
+        pass
     os.system(f"sudo ip link set {interface} down")
     os.system(f"sudo iwconfig {interface} mode Monitor")
     os.system(f"sudo ip link set {interface} up")
@@ -254,7 +264,8 @@ def autoConf(interface:str) -> NoReturn:
     	interface: name of wifi interface being used
 
     """
-
+    os.system(f"sudo ip link set {interface} down")
+    os.system(f"sudo ip link set {interface} up")
     if not isMonitor(interface):  # first try to set it to monitor mode
         enableMonitor(interface)
     if not isMonitor(interface):  # if set fails let the user know

@@ -91,3 +91,37 @@ def restartThreads() -> NoReturn:
     globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
     globaldat.sender_pipe, sender_pipe_output = mp.Pipe()
     setupThreads()
+
+
+
+"""
+
+             receiver thread(HW thread)                                                                                   Sender Thread(HW thread)
+ ┌───────────────────────────────────────────────────┐                                                     ┌───────────────────────────────────────────────────┐
+ │                                                   │                                                     │                                                   │
+ │ receiver thread identifies yodel packets, checks  │                                                     │ sender thread receives data from the main thread  │
+ │ if they are meant for you to receiver, if so,     │                                                     │ through the "outgoing" queue and sends it out     │
+ │ it stores them into the "incoming" queue for the  │                                                     │                                                   │
+ │ main thread to read off                           │                                                     │                                                   │
+ └────────────────────────────────┬──────────────────┘                                                     └───────────────────────────────────────────────────┘
+                       ▲          │                                                                                             ▲          ▲
+                       │          │                                        Main Thread                                          │          │
+                       │          │                   ┌───────────────────────────────────────────────────┐         outgoing    │          │
+                       │          │  incoming         │                                                   │         (one way)   │          │
+                       │          │  (one way)        │ ┌───────────────────────────────────────────────┐ │                     │          │
+    receiver_pipe      │          │                   │ │                                               │ │                     │          │   sender_pipe  (two way)
+      (two way)        │          └──────────────────►│ │                                               │ ├─────────────────────┘          │
+                       │                              │ │        Yodel encoding and Decoding            │ │                                │
+                       │                              │ │        Functionalities                        │ │                                │
+                       └─────────────────────────────►│ │                                               │ │◄───────────────────────────────┘
+                                                      │ └────────────────────┬──────────────────────────┘ │
+                                                      │                      │  ▲                         │
+                                                      │                      ▼  │                         │
+                                                      │ ┌───────────────────────┴───────────────────────┐ │
+                                                      │ │                                               │ │
+                                                      │ │           User script running yodel           │ │
+                                                      │ │                                               │ │
+                                                      │ │                                               │ │
+                                                      │ └───────────────────────────────────────────────┘ │
+                                                      └───────────────────────────────────────────────────┘
+"""

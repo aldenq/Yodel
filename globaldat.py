@@ -10,7 +10,7 @@ robotName: str = ""  # robot name, set by setName during runtime
 groups: List[str] = [""]  # list of groups bot is a part of
 delay: int = 0
 ETH_P_ALL: int = 3
-ETH_FRAME_LEN: int = 1514  # Max. octets in frame sans FCS
+ETH_FRAME_LEN: int = 1514  # bytes in standard 80211 frame
 relay: bool = False
 maxRelay: int = 5
 totalsends: int = 10
@@ -18,6 +18,7 @@ RADIO_TAP: bytearray = b"\x00\x00\x22\x00\xae\x40\x00\xa0\x20\x08\x00\xa0\x20\x0
 lastMid: int = 0  # message ID of last message received
 
 yodelSocket: socket = None
+yodelSocketRecv: socket = None
 debug: bool = True
 sender_thread: multiprocessing.Process = None
 receiver_thread: multiprocessing.Process = None

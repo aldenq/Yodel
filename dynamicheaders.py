@@ -127,11 +127,6 @@ class Section:
         format: format object to be used when encoding this section
     """
 
-
-
-
-
-
     def __init__(self, format: Format):
         # store format so that it can be accessed later as necessary
         self.__dict__["format"] = format

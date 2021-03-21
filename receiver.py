@@ -14,69 +14,75 @@ from .dynamicheaders import *
 from yodel.config import *
 from typing import *
 
-
+import time
 import sys
 import multiprocessing as mp
 incoming = mp.Queue()
 globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
 
-
+pt = time.time()
 # check to see if a given message is intended for this computer, either to
 # receive or to relay
 def is_recipient(
         data: bytearray, radiotap_header_length: int) -> Union[bool, Tuple[bool, bool]]:
-    """
-    check to see if a given message is intended for this computer and if the message should be relayed
+    
+    try:
+        """
+        check to see if a given message is intended for this computer and if the message should be relayed
 
 
-    Args:
-    	 data: raw bytes for incoming message
+        Args:
+            data: raw bytes for incoming message
 
-    	 radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.
-    """
+            radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.
+        """
 
-    # get data frame payload section
-    frame = data[radiotap_header_length + 26 + 5:]
-    pos = 0  # pos is used as a pointer to the current section of the header being decoded
+        # get data frame payload section
+        frame = data[radiotap_header_length + 26 + 5:]
+        pos = 0  # pos is used as a pointer to the current section of the header being decoded
 
-    """
-     message id, the semi unique identifer to each message to avoid receiving
-     them twice
-    """
-    message_ID = frame[pos:pos + 4]
-    if message_ID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
+        """
+        message id, the semi unique identifer to each message to avoid receiving
+        them twice
+        """
+        message_ID = frame[pos:pos + 4]
+        if message_ID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
+            return (False)
+
+        if message_ID not in globaldat.lastMessages:  # check if message has already been received
+
+            globaldat.lastMid = message_ID  # set last mid to the current mid
+            globaldat.lastMessages.append(message_ID)
+            if len(globaldat.lastMessages) > 64:
+                del globaldat.lastMessages[0]
+
+            pos += 4
+            namelen = globaldat.getInt(frame[pos:pos + 1])  # get length of name
+            pos += 1
+
+            name = frame[pos:pos + namelen].decode("utf-8")
+            nameM = (name == globaldat.robotName or namelen == 0 or len(globaldat.robotName) == 0)
+
+            pos += namelen
+            gnamelen = globaldat.getInt(frame[pos:pos + 1])
+            pos += 1
+            group = frame[pos:pos + gnamelen].decode("utf-8")
+            pos += gnamelen
+
+            groupM = (group in globaldat.groups or gnamelen == 0 or len(globaldat.groups) == 1)
+
+            relay = (globaldat.relay == True and not (name == globaldat.robotName))
+            #print(nameM, groupM,time.time()-pt)
+            
+            return(nameM and groupM, True)
+
         return (False)
-
-    if message_ID not in globaldat.lastMessages:  # check if message has already been received
-
-        globaldat.lastMid = message_ID  # set last mid to the current mid
-        globaldat.lastMessages.append(message_ID)
-        if len(globaldat.lastMessages) > 64:
-            del globaldat.lastMessages[0]
-
-        pos += 4
-        namelen = globaldat.getInt(frame[pos:pos + 1])  # get length of name
-        pos += 1
-
-        name = frame[pos:pos + namelen].decode("utf-8")
-        nameM = (name == globaldat.robotName or namelen == 0)
-
-        pos += namelen
-        gnamelen = globaldat.getInt(frame[pos:pos + 1])
-        pos += 1
-        group = frame[pos:pos + gnamelen].decode("utf-8")
-        pos += gnamelen
-
-        groupM = (group in globaldat.groups or gnamelen == 0)
-
-        relay = (globaldat.relay == True and not (name == globaldat.robotName))
-
-        return(nameM and groupM, relay)
-
-    return (False)
+    except:
+        print(data,"err")
 
 
 def relayFrame(frame: bytearray) -> NoReturn:
+    #global pt
     """
     used to allow receiver thread to relay messages back out
 
@@ -84,12 +90,15 @@ def relayFrame(frame: bytearray) -> NoReturn:
     	 frame: bytes of message being relayed
 
     """
-
-    header = b"\x72\x6f\x62\x6f\x74"  # yodel identifier
+    #print("relaying",frame)
+    
     if globaldat.relay == True:  # check if relay is enabled
-
+        
         # format and pass data to sender thread
-        sendData(header + frame, globaldat.maxRelay)
+        #print("relaying!",globaldat.relay)
+       
+            
+        sendData(frame,globaldat.maxRelay)
 
 
 def listenrecv(pipe: mp.Pipe) -> bytearray:
