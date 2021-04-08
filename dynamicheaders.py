@@ -21,13 +21,8 @@ class Flags:
     Class meant to be used in fields, is an array of bools, used to store flags about the packet.
 
     Args:
-        lookup_table: list of strings used to map keys to bits
-
-
-    
+        lookup_table: list of strings used to map keys to bits    
     '''
-    
-
     def __init__(self, lookup_table:list):
         length = 1
         self.data = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -85,13 +80,6 @@ class Format:
     
     	 mtype: short for message type, allows unique identifiers to be given to your format that will be sent along with the format allowing for the receiver to know what format to use to decode the message
     """
-
-
-    
-    
-    
-    
-
     def __init__(self, fields:List, mtype: int = 0):
         self.mtype: int = mtype  # kwargs.get("mtype", 0) #get message type
         supported_types = [int, str, bytearray, Flags]

@@ -23,12 +23,12 @@ globaldat.receiver_pipe, receiver_pipe_output = mp.Pipe()
 pt = time.time()
 # check to see if a given message is intended for this computer, either to
 # receive or to relay
+# 
 def is_recipient(
         data: bytearray, radiotap_header_length: int) -> Union[bool, Tuple[bool, bool]]:
-    
-    try:
-        """
-        check to see if a given message is intended for this computer and if the message should be relayed
+    """
+        check to see if a given message is intended for this computer and if the message should be relayed. decodes Yodel Standard Header
+        Yodel Standard Header is defined and explained in "standardformats.py"
 
 
         Args:
@@ -37,6 +37,8 @@ def is_recipient(
             radiotap_header_length: length of radiotap header, the header is skipped over because it does not hold yodel data.
         """
 
+    try:
+        
         # get data frame payload section
         frame = data[radiotap_header_length + 26 + 5:]
         pos = 0  # pos is used as a pointer to the current section of the header being decoded
@@ -48,9 +50,9 @@ def is_recipient(
         message_ID = frame[pos:pos + 4]
         if message_ID == globaldat.lastMid:  # since messages are repeated a lot it is worth saving the previous message id so that the array does not need to be fully indexed
             return (False)
-
+        #print(globaldat.lastMessages,"fromt")
         if message_ID not in globaldat.lastMessages:  # check if message has already been received
-
+            
             globaldat.lastMid = message_ID  # set last mid to the current mid
             globaldat.lastMessages.append(message_ID)
             if len(globaldat.lastMessages) > 64:
@@ -152,7 +154,7 @@ def settings_check(pipe) -> NoReturn:
     Args:
     	 pipe: same settings pipe as used in receiver
     """
-    if pipe.poll(0):  # check for new data in pipe
+    while pipe.poll(0):  # check for new data in pipe
         settings = pipe.recv()  # get data
         #print(settings,"setting update")
         setting_update(settings[0], settings[1])  # change settings accordingly

@@ -95,7 +95,6 @@ def restartThreads() -> NoReturn:
 
 
 """
-
              receiver thread(HW thread)                                                                                   Sender Thread(HW thread)
  ┌───────────────────────────────────────────────────┐                                                     ┌───────────────────────────────────────────────────┐
  │                                                   │                                                     │                                                   │

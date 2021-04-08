@@ -100,6 +100,8 @@ def send(payload: any, name: str = "", group: str = "") -> NoReturn:
     outgoing_data.Sname = globaldat.robotName
     # generate random indetifier for the message
     outgoing_data.mid = random.randint(-2147483648, 2147483647)
+    
+
     # take the payload and convert it to bytes
     outgoing_data.payload = typeManagment(payload)
     outgoing_data.mtype = mtype
@@ -107,6 +109,12 @@ def send(payload: any, name: str = "", group: str = "") -> NoReturn:
     encoded_frame = bytes(outgoing_data)  # get bytes
     # create object that holds raw bytes as well as data about how it should
     # be sent
+
+    
+    field_data = outgoing_data.mid-standardformats.standard_header_format.fields_dict["mid"].min
+
+    out = field_data.to_bytes(4, 'little')
+    send_to_receiver(["addmid",out])
     outgoing_frame = FrameStruct(encoded_frame)
     outgoing_frame.repeats = globaldat.totalsends
     # push data onto stack so that sender thread can access and send off frame

@@ -28,12 +28,17 @@ def setting_update(setting, value):
     elif setting == "clr_group":  # clear groups
         globaldat.groups = []
     elif setting == "setr":  # enable or disable relaying
-        print("aaa")
+        #print("aaa")
         globaldat.relay = int(value)
     elif setting == "exit":  # exit
         print("exit sender")
 
         sys.exit()
+    elif setting == "addmid":  # exit
+        #print(value)
+        globaldat.lastMessages.append(value)
+
+        
 
 
 def send_to_receiver(data: list) -> NoReturn:
